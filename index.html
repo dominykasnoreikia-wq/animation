@@ -3,7 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Custom 3D Intro With Themes</title>
+  <title>Custom 3D Intro Studio</title>
+
+  <!-- Screenshot library -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Bebas+Neue&family=Orbitron:wght@700;800;900&family=Rajdhani:wght@700&family=Russo+One&display=swap" rel="stylesheet">
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -52,17 +61,18 @@
       --messageText: #ffd6b0;
 
       --helper: #ffd9ba;
+      --accent: #ff7a00;
     }
 
     html, body {
       width: 100%;
       height: 100%;
       overflow: hidden;
-      font-family: Arial, sans-serif;
       background: #000;
     }
 
     body {
+      font-family: Arial, sans-serif;
       background:
         radial-gradient(circle at center, var(--bg1) 0%, var(--bg2) 45%, var(--bg3) 75%, #000 100%);
     }
@@ -276,6 +286,7 @@
       letter-spacing: 5px;
       opacity: 0;
       text-shadow: 0 0 10px var(--subtitleGlow);
+      font-family: Arial, sans-serif;
     }
 
     .play .subtitle { animation: subtitleIn 1.8s ease forwards 4.6s; }
@@ -343,14 +354,7 @@
       transition: opacity 0.25s ease, transform 0.25s ease;
     }
 
-    .left-controls {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .right-controls {
+    .left-controls, .right-controls {
       display: flex;
       gap: 10px;
       align-items: center;
@@ -386,6 +390,10 @@
       color: white;
       cursor: pointer;
       box-shadow: 0 0 18px var(--btnGlow);
+    }
+
+    button:hover {
+      filter: brightness(1.08);
     }
 
     .message {
@@ -452,7 +460,7 @@
     }
 
     .credit-toggle input {
-      accent-color: var(--btn1);
+      accent-color: var(--accent);
     }
 
     .gui-hidden .controls,
@@ -462,7 +470,28 @@
       pointer-events: none;
     }
 
-    @media (max-width: 850px) {
+    .studio-note {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 120;
+      color: var(--helper);
+      font-size: 12px;
+      opacity: 0.8;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      background: var(--inputBg);
+      padding: 8px 12px;
+      border: 1px solid var(--inputBorder);
+      border-radius: 10px;
+    }
+
+    .gui-hidden .studio-note {
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+    }
+
+    @media (max-width: 1000px) {
       .controls {
         flex-direction: column;
         align-items: stretch;
@@ -479,7 +508,7 @@
 </head>
 <body>
   <div class="scene" id="scene">
-    <div class="camera" id="camera">
+    <div class="camera" id="captureArea">
       <div class="bg"></div>
       <div class="grid"></div>
       <div class="particles" id="particles"></div>
@@ -488,10 +517,10 @@
       <div class="shine"></div>
 
       <div class="logo-wrap">
-        <div class="title-text" id="titleText" data-text="Mamo Blox">Mamo Blox</div>
+        <div class="title-text font-orbitron" id="titleText" data-text="Mamo Blox">Mamo Blox</div>
       </div>
 
-      <div class="subtitle">CUSTOM 3D INTRO</div>
+      <div class="subtitle" id="subtitleText">CUSTOM 3D INTRO</div>
       <div class="credit" id="creditText">Intro by Mamo Blox</div>
     </div>
 
@@ -500,6 +529,7 @@
         <input id="textInput" type="text" maxlength="30" placeholder="Type any text..." value="Mamo Blox" />
         <button id="startBtn">Start Intro</button>
         <button id="replayBtn">Replay</button>
+        <button id="downloadBtn">Download Screenshot</button>
       </div>
 
       <div class="right-controls">
@@ -509,6 +539,21 @@
           <option value="green">Green</option>
           <option value="pink">Pink</option>
           <option value="yellow">Yellow</option>
+          <option value="red">Red</option>
+          <option value="purple">Purple</option>
+          <option value="ice">Ice</option>
+          <option value="gold">Gold</option>
+          <option value="white">White</option>
+          <option value="rainbow">Rainbow</option>
+        </select>
+
+        <select id="fontSelect">
+          <option value="orbitron">Orbitron</option>
+          <option value="audiowide">Audiowide</option>
+          <option value="bebas">Bebas Neue</option>
+          <option value="russo">Russo One</option>
+          <option value="rajdhani">Rajdhani</option>
+          <option value="arial">Arial</option>
         </select>
 
         <label class="credit-toggle">
@@ -520,28 +565,34 @@
       </div>
     </div>
 
+    <div class="studio-note">Settings auto-save • Screenshot supported</div>
     <div class="message" id="messageBox">Too long, pick a shorter name/text</div>
   </div>
 
   <script>
     const scene = document.getElementById("scene");
-    const cameraEl = document.getElementById("camera");
+    const captureArea = document.getElementById("captureArea");
+    const cameraEl = document.getElementById("captureArea");
     const particles = document.getElementById("particles");
     const rings = document.getElementById("rings");
     const startBtn = document.getElementById("startBtn");
     const replayBtn = document.getElementById("replayBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
     const textInput = document.getElementById("textInput");
     const titleText = document.getElementById("titleText");
+    const subtitleText = document.getElementById("subtitleText");
     const messageBox = document.getElementById("messageBox");
     const themeSelect = document.getElementById("themeSelect");
+    const fontSelect = document.getElementById("fontSelect");
     const toggleCredit = document.getElementById("toggleCredit");
     const creditText = document.getElementById("creditText");
 
     let audioCtx;
     let currentText = "Mamo Blox";
     let guiHidden = false;
-    let wakeLock = null;
     const pressedKeys = new Set();
+
+    const STORAGE_KEY = "mamo_blox_intro_studio_settings_v1";
 
     const themes = {
       orange: {
@@ -558,7 +609,7 @@
         "--inputBorder": "rgba(255,160,80,0.3)","--inputBg": "rgba(20, 8, 0, 0.75)",
         "--inputText": "#ffe2c2","--inputPlaceholder": "rgba(255,210,170,0.6)",
         "--messageBg": "rgba(40, 10, 0, 0.8)","--messageBorder": "rgba(255,120,0,0.25)",
-        "--messageText": "#ffd6b0","--helper": "#ffd9ba"
+        "--messageText": "#ffd6b0","--helper": "#ffd9ba","--accent": "#ff7a00"
       },
       blue: {
         "--bg1": "#08182e","--bg2": "#050c18","--bg3": "#02050a",
@@ -574,7 +625,7 @@
         "--inputBorder": "rgba(90,170,255,0.3)","--inputBg": "rgba(4, 10, 25, 0.75)",
         "--inputText": "#d9f1ff","--inputPlaceholder": "rgba(180,220,255,0.6)",
         "--messageBg": "rgba(5, 18, 40, 0.8)","--messageBorder": "rgba(80,150,255,0.25)",
-        "--messageText": "#d5ebff","--helper": "#cde8ff"
+        "--messageText": "#d5ebff","--helper": "#cde8ff","--accent": "#23a6ff"
       },
       green: {
         "--bg1": "#081f12","--bg2": "#04110a","--bg3": "#010503",
@@ -590,7 +641,7 @@
         "--inputBorder": "rgba(100,255,170,0.3)","--inputBg": "rgba(4, 20, 10, 0.75)",
         "--inputText": "#dcffeb","--inputPlaceholder": "rgba(190,255,220,0.6)",
         "--messageBg": "rgba(5, 35, 16, 0.8)","--messageBorder": "rgba(80,255,150,0.25)",
-        "--messageText": "#d7ffea","--helper": "#d6ffea"
+        "--messageText": "#d7ffea","--helper": "#d6ffea","--accent": "#1dff91"
       },
       pink: {
         "--bg1": "#2b0820","--bg2": "#14050f","--bg3": "#060104",
@@ -606,7 +657,7 @@
         "--inputBorder": "rgba(255,130,210,0.3)","--inputBg": "rgba(25, 4, 18, 0.75)",
         "--inputText": "#ffe0f4","--inputPlaceholder": "rgba(255,200,230,0.6)",
         "--messageBg": "rgba(40, 8, 28, 0.8)","--messageBorder": "rgba(255,120,200,0.25)",
-        "--messageText": "#ffd8f0","--helper": "#ffd8f0"
+        "--messageText": "#ffd8f0","--helper": "#ffd8f0","--accent": "#ff5cc7"
       },
       yellow: {
         "--bg1": "#2b2500","--bg2": "#141000","--bg3": "#050400",
@@ -622,8 +673,113 @@
         "--inputBorder": "rgba(255,220,100,0.3)","--inputBg": "rgba(25, 20, 2, 0.75)",
         "--inputText": "#fff4cb","--inputPlaceholder": "rgba(255,240,180,0.6)",
         "--messageBg": "rgba(45, 35, 4, 0.8)","--messageBorder": "rgba(255,220,80,0.25)",
-        "--messageText": "#fff0bf","--helper": "#fff0bf"
+        "--messageText": "#fff0bf","--helper": "#fff0bf","--accent": "#ffd83a"
+      },
+      red: {
+        "--bg1": "#240707","--bg2": "#120303","--bg3": "#040101",
+        "--orb1": "rgba(255,70,70,0.14)","--orb2": "rgba(200,0,0,0.18)","--orb3": "rgba(255,180,180,0.03)",
+        "--grid1": "rgba(255,50,50,0.09)","--grid2": "rgba(255,90,90,0.09)",
+        "--particle": "#ff4545","--particleGlow": "#ff2020","--ring": "rgba(255,70,70,0.15)",
+        "--titleMain": "#ffd2d2","--titleGlow1": "rgba(255,210,210,0.95)","--titleGlow2": "rgba(255,60,60,0.8)",
+        "--titleGlow3": "rgba(255,20,20,0.6)","--titleGlow4": "rgba(180,0,0,0.28)",
+        "--titleBefore": "#aa1f1f","--titleAfter": "#541010",
+        "--subtitle": "rgba(255,220,220,0.94)","--subtitleGlow": "rgba(255,80,80,0.35)",
+        "--flash": "rgba(255,170,170,0.22)","--shine": "rgba(255,180,180,0.22)",
+        "--btn1": "#ff4a4a","--btn2": "#a80000","--btnGlow": "rgba(255,70,70,0.25)",
+        "--inputBorder": "rgba(255,130,130,0.3)","--inputBg": "rgba(25, 5, 5, 0.75)",
+        "--inputText": "#ffe3e3","--inputPlaceholder": "rgba(255,200,200,0.6)",
+        "--messageBg": "rgba(40, 8, 8, 0.8)","--messageBorder": "rgba(255,90,90,0.25)",
+        "--messageText": "#ffd6d6","--helper": "#ffd6d6","--accent": "#ff4a4a"
+      },
+      purple: {
+        "--bg1": "#180824","--bg2": "#0b0414","--bg3": "#030106",
+        "--orb1": "rgba(170,80,255,0.14)","--orb2": "rgba(120,0,255,0.18)","--orb3": "rgba(220,180,255,0.03)",
+        "--grid1": "rgba(180,90,255,0.09)","--grid2": "rgba(210,130,255,0.09)",
+        "--particle": "#bb68ff","--particleGlow": "#9c35ff","--ring": "rgba(170,80,255,0.15)",
+        "--titleMain": "#ead5ff","--titleGlow1": "rgba(234,213,255,0.95)","--titleGlow2": "rgba(180,90,255,0.8)",
+        "--titleGlow3": "rgba(130,40,255,0.6)","--titleGlow4": "rgba(90,0,180,0.28)",
+        "--titleBefore": "#7431b3","--titleAfter": "#3a145b",
+        "--subtitle": "rgba(240,225,255,0.94)","--subtitleGlow": "rgba(180,90,255,0.35)",
+        "--flash": "rgba(220,180,255,0.22)","--shine": "rgba(225,190,255,0.22)",
+        "--btn1": "#b86bff","--btn2": "#5b18a8","--btnGlow": "rgba(170,80,255,0.25)",
+        "--inputBorder": "rgba(190,130,255,0.3)","--inputBg": "rgba(15, 5, 28, 0.75)",
+        "--inputText": "#efe0ff","--inputPlaceholder": "rgba(220,190,255,0.6)",
+        "--messageBg": "rgba(20, 8, 40, 0.8)","--messageBorder": "rgba(170,110,255,0.25)",
+        "--messageText": "#ead8ff","--helper": "#ead8ff","--accent": "#b86bff"
+      },
+      ice: {
+        "--bg1": "#081a1f","--bg2": "#041014","--bg3": "#010607",
+        "--orb1": "rgba(120,240,255,0.14)","--orb2": "rgba(70,200,255,0.18)","--orb3": "rgba(220,255,255,0.03)",
+        "--grid1": "rgba(140,240,255,0.09)","--grid2": "rgba(180,255,255,0.09)",
+        "--particle": "#90f5ff","--particleGlow": "#4be7ff","--ring": "rgba(140,240,255,0.15)",
+        "--titleMain": "#e8fdff","--titleGlow1": "rgba(232,253,255,0.95)","--titleGlow2": "rgba(130,245,255,0.8)",
+        "--titleGlow3": "rgba(80,220,255,0.6)","--titleGlow4": "rgba(50,160,220,0.28)",
+        "--titleBefore": "#57a7b5","--titleAfter": "#24515a",
+        "--subtitle": "rgba(230,252,255,0.94)","--subtitleGlow": "rgba(110,235,255,0.35)",
+        "--flash": "rgba(220,255,255,0.22)","--shine": "rgba(230,255,255,0.22)",
+        "--btn1": "#7beeff","--btn2": "#2d9db0","--btnGlow": "rgba(100,240,255,0.25)",
+        "--inputBorder": "rgba(160,245,255,0.3)","--inputBg": "rgba(5, 18, 22, 0.75)",
+        "--inputText": "#e9fdff","--inputPlaceholder": "rgba(210,250,255,0.6)",
+        "--messageBg": "rgba(8, 25, 30, 0.8)","--messageBorder": "rgba(130,240,255,0.25)",
+        "--messageText": "#e0fdff","--helper": "#dffcff","--accent": "#7beeff"
+      },
+      gold: {
+        "--bg1": "#241b06","--bg2": "#120d02","--bg3": "#050300",
+        "--orb1": "rgba(255,210,90,0.14)","--orb2": "rgba(220,160,0,0.18)","--orb3": "rgba(255,240,180,0.03)",
+        "--grid1": "rgba(255,210,70,0.09)","--grid2": "rgba(255,230,120,0.09)",
+        "--particle": "#ffd56a","--particleGlow": "#ffbf33","--ring": "rgba(255,210,70,0.15)",
+        "--titleMain": "#fff1c4","--titleGlow1": "rgba(255,241,196,0.95)","--titleGlow2": "rgba(255,210,60,0.8)",
+        "--titleGlow3": "rgba(255,170,0,0.6)","--titleGlow4": "rgba(180,120,0,0.28)",
+        "--titleBefore": "#b3861f","--titleAfter": "#5c430f",
+        "--subtitle": "rgba(255,245,210,0.94)","--subtitleGlow": "rgba(255,205,60,0.35)",
+        "--flash": "rgba(255,240,180,0.22)","--shine": "rgba(255,245,190,0.22)",
+        "--btn1": "#ffd86a","--btn2": "#b07b13","--btnGlow": "rgba(255,200,60,0.25)",
+        "--inputBorder": "rgba(255,220,120,0.3)","--inputBg": "rgba(26, 20, 5, 0.75)",
+        "--inputText": "#fff4d6","--inputPlaceholder": "rgba(255,240,190,0.6)",
+        "--messageBg": "rgba(40, 30, 6, 0.8)","--messageBorder": "rgba(255,210,90,0.25)",
+        "--messageText": "#fff1c9","--helper": "#fff0c2","--accent": "#ffd86a"
+      },
+      white: {
+        "--bg1": "#202020","--bg2": "#101010","--bg3": "#050505",
+        "--orb1": "rgba(255,255,255,0.10)","--orb2": "rgba(220,220,220,0.12)","--orb3": "rgba(255,255,255,0.03)",
+        "--grid1": "rgba(255,255,255,0.07)","--grid2": "rgba(220,220,220,0.07)",
+        "--particle": "#ffffff","--particleGlow": "#d9d9d9","--ring": "rgba(255,255,255,0.12)",
+        "--titleMain": "#ffffff","--titleGlow1": "rgba(255,255,255,0.95)","--titleGlow2": "rgba(230,230,230,0.75)",
+        "--titleGlow3": "rgba(200,200,200,0.50)","--titleGlow4": "rgba(160,160,160,0.22)",
+        "--titleBefore": "#bdbdbd","--titleAfter": "#6d6d6d",
+        "--subtitle": "rgba(245,245,245,0.94)","--subtitleGlow": "rgba(255,255,255,0.30)",
+        "--flash": "rgba(255,255,255,0.18)","--shine": "rgba(255,255,255,0.18)",
+        "--btn1": "#ffffff","--btn2": "#999999","--btnGlow": "rgba(255,255,255,0.20)",
+        "--inputBorder": "rgba(255,255,255,0.20)","--inputBg": "rgba(20, 20, 20, 0.75)",
+        "--inputText": "#ffffff","--inputPlaceholder": "rgba(230,230,230,0.6)",
+        "--messageBg": "rgba(30, 30, 30, 0.8)","--messageBorder": "rgba(255,255,255,0.18)",
+        "--messageText": "#ffffff","--helper": "#eeeeee","--accent": "#ffffff"
+      },
+      rainbow: {
+        "--bg1": "#1a001a","--bg2": "#0d0010","--bg3": "#040004",
+        "--orb1": "rgba(255,0,120,0.14)","--orb2": "rgba(0,180,255,0.18)","--orb3": "rgba(255,255,120,0.03)",
+        "--grid1": "rgba(255,0,180,0.09)","--grid2": "rgba(0,200,255,0.09)",
+        "--particle": "#ff4fe1","--particleGlow": "#44d7ff","--ring": "rgba(255,90,255,0.15)",
+        "--titleMain": "#ffffff","--titleGlow1": "rgba(255,255,255,0.95)","--titleGlow2": "rgba(255,0,180,0.8)",
+        "--titleGlow3": "rgba(0,180,255,0.6)","--titleGlow4": "rgba(255,220,0,0.28)",
+        "--titleBefore": "#ff48b0","--titleAfter": "#2d6eff",
+        "--subtitle": "rgba(255,255,255,0.94)","--subtitleGlow": "rgba(255,100,255,0.35)",
+        "--flash": "rgba(255,255,255,0.20)","--shine": "rgba(255,255,255,0.22)",
+        "--btn1": "#ff48b0","--btn2": "#2d6eff","--btnGlow": "rgba(255,100,255,0.25)",
+        "--inputBorder": "rgba(255,150,255,0.3)","--inputBg": "rgba(20, 5, 24, 0.75)",
+        "--inputText": "#ffffff","--inputPlaceholder": "rgba(255,220,255,0.6)",
+        "--messageBg": "rgba(30, 10, 35, 0.8)","--messageBorder": "rgba(255,130,255,0.25)",
+        "--messageText": "#ffffff","--helper": "#ffe9ff","--accent": "#ff48b0"
       }
+    };
+
+    const fontMap = {
+      orbitron: "'Orbitron', Arial, sans-serif",
+      audiowide: "'Audiowide', Arial, sans-serif",
+      bebas: "'Bebas Neue', Arial, sans-serif",
+      russo: "'Russo One', Arial, sans-serif",
+      rajdhani: "'Rajdhani', Arial, sans-serif",
+      arial: "Arial, sans-serif"
     };
 
     function applyTheme(name) {
@@ -631,6 +787,14 @@
       for (const key in theme) {
         document.documentElement.style.setProperty(key, theme[key]);
       }
+      saveSettings();
+    }
+
+    function applyFont(fontName) {
+      const font = fontMap[fontName] || fontMap.orbitron;
+      titleText.style.fontFamily = font;
+      subtitleText.style.fontFamily = font;
+      saveSettings();
     }
 
     function showMessage(msg) {
@@ -692,29 +856,6 @@
 
       requestAnimationFrame(frame);
     }
-
-    async function requestWakeLock() {
-      try {
-        if ("wakeLock" in navigator) {
-          wakeLock = await navigator.wakeLock.request("screen");
-          console.log("Wake Lock active");
-
-          wakeLock.addEventListener("release", () => {
-            console.log("Wake Lock released");
-          });
-        } else {
-          console.log("Wake Lock API not supported");
-        }
-      } catch (err) {
-        console.error("Wake Lock error:", err);
-      }
-    }
-
-    document.addEventListener("visibilitychange", async () => {
-      if (document.visibilityState === "visible" && wakeLock !== null) {
-        await requestWakeLock();
-      }
-    });
 
     function ensureAudio() {
       if (!audioCtx) {
@@ -848,19 +989,19 @@
       let fontSize = Math.min(window.innerWidth * 0.09, 150);
       let fits = false;
 
-      for (let i = 0; i < 60; i++) {
+      for (let i = 0; i < 70; i++) {
         titleText.style.fontSize = fontSize + "px";
-        titleText.style.letterSpacing = Math.max(2, fontSize * 0.055) + "px";
+        titleText.style.letterSpacing = Math.max(1, fontSize * 0.05) + "px";
 
         const width = titleText.getBoundingClientRect().width;
         if (width <= wrapWidth) {
           fits = true;
           break;
         }
-        fontSize -= 2.5;
+        fontSize -= 2.2;
       }
 
-      if (!fits || fontSize < 26) {
+      if (!fits || fontSize < 24) {
         return { ok: false, reason: "Too long, pick a shorter name/text" };
       }
 
@@ -883,6 +1024,8 @@
       }
 
       currentText = result.text;
+      saveSettings();
+
       resetIntro();
       scene.classList.add("play");
       playIntroAudio();
@@ -902,31 +1045,99 @@
       }
     }
 
-    startBtn.addEventListener("click", async () => {
-      await requestWakeLock();
+    async function downloadScreenshot() {
+      try {
+        const wasGuiHidden = guiHidden;
+        if (!wasGuiHidden) {
+          scene.classList.add("gui-hidden");
+        }
+
+        messageBox.classList.remove("show");
+
+        const canvas = await html2canvas(captureArea, {
+          backgroundColor: null,
+          useCORS: true,
+          scale: 2
+        });
+
+        if (!wasGuiHidden) {
+          scene.classList.remove("gui-hidden");
+        }
+
+        const link = document.createElement("a");
+        const safeName = (currentText || "intro").replace(/[^\w\-]+/g, "_");
+        link.download = `${safeName}_intro.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      } catch (err) {
+        console.error(err);
+        showMessage("Screenshot failed");
+      }
+    }
+
+    function saveSettings() {
+      const settings = {
+        text: textInput.value,
+        theme: themeSelect.value,
+        font: fontSelect.value,
+        creditVisible: toggleCredit.checked
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    }
+
+    function loadSettings() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+
+      try {
+        const settings = JSON.parse(raw);
+        if (settings.text !== undefined) textInput.value = settings.text;
+        if (settings.theme && themes[settings.theme]) themeSelect.value = settings.theme;
+        if (settings.font && fontMap[settings.font]) fontSelect.value = settings.font;
+        if (typeof settings.creditVisible === "boolean") toggleCredit.checked = settings.creditVisible;
+      } catch (e) {
+        console.warn("Failed to load settings");
+      }
+    }
+
+    function updateCreditVisibility() {
+      if (toggleCredit.checked) {
+        creditText.classList.remove("hidden");
+      } else {
+        creditText.classList.add("hidden");
+      }
+      saveSettings();
+    }
+
+    startBtn.addEventListener("click", () => {
       startIntro(textInput.value);
     });
 
-    replayBtn.addEventListener("click", async () => {
-      await requestWakeLock();
+    replayBtn.addEventListener("click", () => {
       startIntro(currentText || textInput.value);
     });
 
+    downloadBtn.addEventListener("click", downloadScreenshot);
+
     textInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") startIntro(textInput.value);
+    });
+
+    textInput.addEventListener("input", () => {
+      saveSettings();
+      fitText(textInput.value || "Mamo Blox");
     });
 
     themeSelect.addEventListener("change", () => {
       applyTheme(themeSelect.value);
     });
 
-    toggleCredit.addEventListener("change", () => {
-      if (toggleCredit.checked) {
-        creditText.classList.remove("hidden");
-      } else {
-        creditText.classList.add("hidden");
-      }
+    fontSelect.addEventListener("change", () => {
+      applyFont(fontSelect.value);
+      fitText(textInput.value || currentText || "Mamo Blox");
     });
+
+    toggleCredit.addEventListener("change", updateCreditVisibility);
 
     document.addEventListener("keydown", (e) => {
       pressedKeys.add(e.key.toLowerCase());
@@ -945,9 +1156,13 @@
       fitText(currentText || textInput.value || "Mamo Blox");
     });
 
-    applyTheme("orange");
+    loadSettings();
+    applyTheme(themeSelect.value || "orange");
+    applyFont(fontSelect.value || "orbitron");
+    updateCreditVisibility();
     buildParticles();
     buildRings();
+    currentText = textInput.value || "Mamo Blox";
     fitText(currentText);
   </script>
 </body>

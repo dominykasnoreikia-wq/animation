@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Custom 3D Intro Studio</title>
 
-  <!-- Screenshot library -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Bebas+Neue&family=Orbitron:wght@700;800;900&family=Rajdhani:wght@700&family=Russo+One&display=swap" rel="stylesheet">
@@ -276,6 +274,135 @@
       }
     }
 
+    /* extra entrance animations */
+    .play.anim-zoom .title-text {
+      animation:
+        animZoomIn 4.8s cubic-bezier(.2,.8,.2,1) forwards,
+        titleFloat 4s ease-in-out infinite 4.8s,
+        titleGlow 2.6s ease-in-out infinite 4.8s;
+    }
+
+    .play.anim-slide-left .title-text {
+      animation:
+        animSlideLeft 4.2s cubic-bezier(.2,.8,.2,1) forwards,
+        titleFloat 4s ease-in-out infinite 4.2s,
+        titleGlow 2.6s ease-in-out infinite 4.2s;
+    }
+
+    .play.anim-slide-top .title-text {
+      animation:
+        animSlideTop 4.2s cubic-bezier(.2,.8,.2,1) forwards,
+        titleFloat 4s ease-in-out infinite 4.2s,
+        titleGlow 2.6s ease-in-out infinite 4.2s;
+    }
+
+    .play.anim-spin .title-text {
+      animation:
+        animSpinIn 4.8s cubic-bezier(.2,.8,.2,1) forwards,
+        titleFloat 4s ease-in-out infinite 4.8s,
+        titleGlow 2.6s ease-in-out infinite 4.8s;
+    }
+
+    .play.anim-bounce .title-text {
+      animation:
+        animBounceIn 4.2s cubic-bezier(.2,.8,.2,1) forwards,
+        titleFloat 4s ease-in-out infinite 4.2s,
+        titleGlow 2.6s ease-in-out infinite 4.2s;
+    }
+
+    @keyframes animZoomIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.05) translateZ(-900px);
+        filter: blur(25px);
+      }
+      50% {
+        opacity: 0.9;
+        transform: scale(1.18) translateZ(100px);
+        filter: blur(2px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateZ(0);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes animSlideLeft {
+      0% {
+        opacity: 0;
+        transform: translateX(-900px) rotateY(55deg) scale(0.6);
+        filter: blur(16px);
+      }
+      65% {
+        opacity: 1;
+        transform: translateX(30px) rotateY(-8deg) scale(1.05);
+        filter: blur(0);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0) rotateY(0deg) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes animSlideTop {
+      0% {
+        opacity: 0;
+        transform: translateY(-500px) rotateX(70deg) scale(0.55);
+        filter: blur(18px);
+      }
+      65% {
+        opacity: 1;
+        transform: translateY(25px) rotateX(-8deg) scale(1.05);
+        filter: blur(0);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) rotateX(0deg) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes animSpinIn {
+      0% {
+        opacity: 0;
+        transform: rotateX(360deg) rotateY(360deg) scale(0.2);
+        filter: blur(18px);
+      }
+      70% {
+        opacity: 1;
+        transform: rotateX(-15deg) rotateY(10deg) scale(1.08);
+        filter: blur(0);
+      }
+      100% {
+        opacity: 1;
+        transform: rotateX(0deg) rotateY(0deg) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes animBounceIn {
+      0% {
+        opacity: 0;
+        transform: translateY(350px) scale(0.45);
+        filter: blur(16px);
+      }
+      50% {
+        opacity: 1;
+        transform: translateY(-35px) scale(1.08);
+        filter: blur(0);
+      }
+      72% {
+        transform: translateY(18px) scale(0.97);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
     .subtitle {
       position: absolute;
       bottom: 13%;
@@ -291,6 +418,17 @@
 
     .play .subtitle { animation: subtitleIn 1.8s ease forwards 4.6s; }
 
+    .play.anim-slide-left .subtitle,
+    .play.anim-slide-top .subtitle,
+    .play.anim-bounce .subtitle {
+      animation-delay: 3.5s;
+    }
+
+    .play.anim-spin .subtitle,
+    .play.anim-zoom .subtitle {
+      animation-delay: 4.1s;
+    }
+
     @keyframes subtitleIn {
       from { opacity: 0; transform: translateY(25px); filter: blur(5px); }
       to { opacity: 1; transform: translateY(0); filter: blur(0); }
@@ -305,6 +443,17 @@
     }
 
     .play .flash { animation: flashBurst 2s ease-out 2.2s forwards; }
+
+    .play.anim-slide-left .flash,
+    .play.anim-slide-top .flash,
+    .play.anim-bounce .flash {
+      animation-delay: 1.7s;
+    }
+
+    .play.anim-spin .flash,
+    .play.anim-zoom .flash {
+      animation-delay: 2s;
+    }
 
     @keyframes flashBurst {
       0% { opacity: 0; transform: scale(0.2); }
@@ -517,7 +666,7 @@
       <div class="shine"></div>
 
       <div class="logo-wrap">
-        <div class="title-text font-orbitron" id="titleText" data-text="Mamo Blox">Mamo Blox</div>
+        <div class="title-text" id="titleText" data-text="Mamo Blox">Mamo Blox</div>
       </div>
 
       <div class="subtitle" id="subtitleText">CUSTOM 3D INTRO</div>
@@ -556,6 +705,15 @@
           <option value="arial">Arial</option>
         </select>
 
+        <select id="animationSelect">
+          <option value="classic">Classic 3D</option>
+          <option value="zoom">Zoom In</option>
+          <option value="slide-left">Slide From Left</option>
+          <option value="slide-top">Drop From Top</option>
+          <option value="spin">Spin In</option>
+          <option value="bounce">Bounce In</option>
+        </select>
+
         <label class="credit-toggle">
           <input type="checkbox" id="toggleCredit" checked />
           Show credit
@@ -565,7 +723,7 @@
       </div>
     </div>
 
-    <div class="studio-note">Settings auto-save • Screenshot supported</div>
+    <div class="studio-note">Settings auto-save • Screenshot supported • 6 animations</div>
     <div class="message" id="messageBox">Too long, pick a shorter name/text</div>
   </div>
 
@@ -584,6 +742,7 @@
     const messageBox = document.getElementById("messageBox");
     const themeSelect = document.getElementById("themeSelect");
     const fontSelect = document.getElementById("fontSelect");
+    const animationSelect = document.getElementById("animationSelect");
     const toggleCredit = document.getElementById("toggleCredit");
     const creditText = document.getElementById("creditText");
 
@@ -592,7 +751,7 @@
     let guiHidden = false;
     const pressedKeys = new Set();
 
-    const STORAGE_KEY = "mamo_blox_intro_studio_settings_v1";
+    const STORAGE_KEY = "mamo_blox_intro_studio_settings_v2";
 
     const themes = {
       orange: {
@@ -782,6 +941,15 @@
       arial: "Arial, sans-serif"
     };
 
+    const animationClassMap = {
+      classic: "",
+      zoom: "anim-zoom",
+      "slide-left": "anim-slide-left",
+      "slide-top": "anim-slide-top",
+      spin: "anim-spin",
+      bounce: "anim-bounce"
+    };
+
     function applyTheme(name) {
       const theme = themes[name] || themes.orange;
       for (const key in theme) {
@@ -794,6 +962,17 @@
       const font = fontMap[fontName] || fontMap.orbitron;
       titleText.style.fontFamily = font;
       subtitleText.style.fontFamily = font;
+      saveSettings();
+    }
+
+    function applyAnimationMode(mode) {
+      Object.values(animationClassMap).forEach(cls => {
+        if (cls) scene.classList.remove(cls);
+      });
+
+      const selectedClass = animationClassMap[mode];
+      if (selectedClass) scene.classList.add(selectedClass);
+
       saveSettings();
     }
 
@@ -1014,6 +1193,7 @@
       void scene.offsetWidth;
       buildParticles();
       buildRings();
+      applyAnimationMode(animationSelect.value);
     }
 
     function startIntro(text) {
@@ -1030,9 +1210,28 @@
       scene.classList.add("play");
       playIntroAudio();
 
-      setTimeout(() => strongShake(10, 350), 1400);
-      setTimeout(() => strongShake(26, 700), 2550);
-      setTimeout(() => strongShake(12, 450), 4700);
+      const mode = animationSelect.value;
+
+      if (mode === "classic") {
+        setTimeout(() => strongShake(10, 350), 1400);
+        setTimeout(() => strongShake(26, 700), 2550);
+        setTimeout(() => strongShake(12, 450), 4700);
+      } else if (mode === "zoom") {
+        setTimeout(() => strongShake(8, 260), 1300);
+        setTimeout(() => strongShake(18, 520), 2100);
+      } else if (mode === "slide-left") {
+        setTimeout(() => strongShake(10, 300), 1200);
+        setTimeout(() => strongShake(20, 500), 1850);
+      } else if (mode === "slide-top") {
+        setTimeout(() => strongShake(12, 320), 1200);
+        setTimeout(() => strongShake(22, 550), 1800);
+      } else if (mode === "spin") {
+        setTimeout(() => strongShake(8, 280), 1500);
+        setTimeout(() => strongShake(16, 480), 2200);
+      } else if (mode === "bounce") {
+        setTimeout(() => strongShake(14, 300), 1100);
+        setTimeout(() => strongShake(22, 500), 1600);
+      }
     }
 
     function toggleGUI() {
@@ -1080,6 +1279,7 @@
         text: textInput.value,
         theme: themeSelect.value,
         font: fontSelect.value,
+        animation: animationSelect.value,
         creditVisible: toggleCredit.checked
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
@@ -1094,6 +1294,7 @@
         if (settings.text !== undefined) textInput.value = settings.text;
         if (settings.theme && themes[settings.theme]) themeSelect.value = settings.theme;
         if (settings.font && fontMap[settings.font]) fontSelect.value = settings.font;
+        if (settings.animation && animationClassMap.hasOwnProperty(settings.animation)) animationSelect.value = settings.animation;
         if (typeof settings.creditVisible === "boolean") toggleCredit.checked = settings.creditVisible;
       } catch (e) {
         console.warn("Failed to load settings");
@@ -1137,6 +1338,10 @@
       fitText(textInput.value || currentText || "Mamo Blox");
     });
 
+    animationSelect.addEventListener("change", () => {
+      applyAnimationMode(animationSelect.value);
+    });
+
     toggleCredit.addEventListener("change", updateCreditVisibility);
 
     document.addEventListener("keydown", (e) => {
@@ -1159,6 +1364,7 @@
     loadSettings();
     applyTheme(themeSelect.value || "orange");
     applyFont(fontSelect.value || "orbitron");
+    applyAnimationMode(animationSelect.value || "classic");
     updateCreditVisibility();
     buildParticles();
     buildRings();

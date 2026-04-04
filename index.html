@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Custom 3D Intro With Themes</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg1: #2b0d00;
+      --bg2: #120500;
+      --bg3: #050100;
+
+      --orb1: rgba(255,80,0,0.14);
+      --orb2: rgba(255,20,0,0.18);
+      --orb3: rgba(255,180,80,0.03);
+
+      --grid1: rgba(255,90,0,0.09);
+      --grid2: rgba(255,120,0,0.09);
+
+      --particle: #ff7b00;
+      --particleGlow: #ff5e00;
+      --ring: rgba(255,110,0,0.15);
+
+      --titleMain: #ffd6a0;
+      --titleGlow1: rgba(255,214,160,0.95);
+      --titleGlow2: rgba(255,120,0,0.8);
+      --titleGlow3: rgba(255,70,0,0.6);
+      --titleGlow4: rgba(255,40,0,0.28);
+
+      --titleBefore: #b83a00;
+      --titleAfter: #5f1800;
+
+      --subtitle: rgba(255,220,180,0.94);
+      --subtitleGlow: rgba(255,100,0,0.35);
+
+      --flash: rgba(255,200,120,0.22);
+      --shine: rgba(255,220,140,0.22);
+
+      --btn1: #ff7a00;
+      --btn2: #b32000;
+      --btnGlow: rgba(255,100,0,0.25);
+
+      --inputBorder: rgba(255,160,80,0.3);
+      --inputBg: rgba(20, 8, 0, 0.75);
+      --inputText: #ffe2c2;
+      --inputPlaceholder: rgba(255,210,170,0.6);
+
+      --messageBg: rgba(40, 10, 0, 0.8);
+      --messageBorder: rgba(255,120,0,0.25);
+      --messageText: #ffd6b0;
+
+      --helper: #ffd9ba;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      background: #000;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at center, var(--bg1) 0%, var(--bg2) 45%, var(--bg3) 75%, #000 100%);
+    }
+
+    .scene {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      perspective: 1600px;
+    }
+
+    .camera {
+      position: absolute;
+      inset: 0;
+      transform-origin: center center;
+    }
+
+    .bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 25% 25%, var(--orb1), transparent 24%),
+        radial-gradient(circle at 75% 60%, var(--orb2), transparent 28%),
+        radial-gradient(circle at center, var(--orb3), transparent 60%);
+      animation: bgPulse 8s ease-in-out infinite paused;
+    }
+
+    .play .bg { animation-play-state: running; }
+
+    @keyframes bgPulse {
+      0%,100% { transform: scale(1); filter: hue-rotate(0deg); }
+      50% { transform: scale(1.06); filter: hue-rotate(-10deg); }
+    }
+
+    .grid {
+      position: absolute;
+      width: 220%;
+      height: 220%;
+      left: -60%;
+      top: 28%;
+      background:
+        linear-gradient(var(--grid1) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid2) 1px, transparent 1px);
+      background-size: 54px 54px;
+      transform: rotateX(76deg);
+      transform-origin: center;
+      opacity: 0.24;
+      animation: gridMove 10s linear infinite paused;
+    }
+
+    .play .grid { animation-play-state: running; }
+
+    @keyframes gridMove {
+      from { background-position: 0 0, 0 0; }
+      to   { background-position: 0 340px, 340px 0; }
+    }
+
+    .particles, .rings {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--particle);
+      box-shadow: 0 0 12px var(--particleGlow);
+      animation: floatUp linear infinite paused;
+    }
+
+    .play .particle { animation-play-state: running; }
+
+    @keyframes floatUp {
+      0% { transform: translateY(120vh) scale(0.25); opacity: 0; }
+      20% { opacity: 0.85; }
+      100% { transform: translateY(-20vh) scale(1.15); opacity: 0; }
+    }
+
+    .ring {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      border: 2px solid var(--ring);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      animation: ringExpand 5s ease-out infinite paused;
+    }
+
+    .play .ring { animation-play-state: running; }
+
+    @keyframes ringExpand {
+      0% { width: 80px; height: 80px; opacity: 0.8; }
+      100% { width: 1000px; height: 1000px; opacity: 0; }
+    }
+
+    .logo-wrap {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transform-style: preserve-3d;
+      padding: 0 5vw;
+    }
+
+    .title-text {
+      position: relative;
+      font-weight: 900;
+      letter-spacing: 8px;
+      text-transform: uppercase;
+      color: var(--titleMain);
+      opacity: 0;
+      transform-style: preserve-3d;
+      text-align: center;
+      white-space: nowrap;
+      text-shadow:
+        0 0 10px var(--titleGlow1),
+        0 0 20px var(--titleGlow2),
+        0 0 45px var(--titleGlow3),
+        0 0 90px var(--titleGlow4);
+    }
+
+    .play .title-text {
+      animation:
+        titleIntro 5.5s cubic-bezier(.2,.8,.2,1) forwards,
+        titleFloat 4s ease-in-out infinite 5.5s,
+        titleGlow 2.6s ease-in-out infinite 5.5s;
+    }
+
+    .title-text::before,
+    .title-text::after {
+      content: attr(data-text);
+      position: absolute;
+      inset: 0;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .title-text::before {
+      color: var(--titleBefore);
+      transform: translateZ(-30px) translate(8px, 8px);
+      opacity: 0.82;
+      filter: blur(0.5px);
+      text-shadow: none;
+    }
+
+    .title-text::after {
+      color: var(--titleAfter);
+      transform: translateZ(-60px) translate(16px, 16px);
+      opacity: 0.55;
+      text-shadow: none;
+    }
+
+    @keyframes titleIntro {
+      0% {
+        opacity: 0;
+        transform: rotateX(80deg) rotateY(-35deg) scale(0.2) translateZ(-850px);
+        filter: blur(20px);
+      }
+      25% { opacity: 0.3; }
+      45% {
+        opacity: 0.8;
+        transform: rotateX(22deg) rotateY(18deg) scale(0.75) translateZ(120px);
+        filter: blur(5px);
+      }
+      65% {
+        opacity: 1;
+        transform: rotateX(-8deg) rotateY(-7deg) scale(1.14) translateZ(60px);
+        filter: blur(0);
+      }
+      100% {
+        opacity: 1;
+        transform: rotateX(0deg) rotateY(0deg) scale(1) translateZ(0);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes titleFloat {
+      0%,100% { transform: translateY(0) rotateY(0deg); }
+      25% { transform: translateY(-8px) rotateY(-3deg); }
+      50% { transform: translateY(-14px) rotateY(3deg); }
+      75% { transform: translateY(-7px) rotateY(-2deg); }
+    }
+
+    @keyframes titleGlow {
+      0%,100% {
+        text-shadow:
+          0 0 10px var(--titleGlow1),
+          0 0 20px var(--titleGlow2),
+          0 0 45px var(--titleGlow3),
+          0 0 90px var(--titleGlow4);
+      }
+      50% {
+        text-shadow:
+          0 0 20px rgba(255,255,255,1),
+          0 0 35px var(--titleGlow2),
+          0 0 70px var(--titleGlow3),
+          0 0 120px var(--titleGlow4);
+      }
+    }
+
+    .subtitle {
+      position: absolute;
+      bottom: 13%;
+      width: 100%;
+      text-align: center;
+      color: var(--subtitle);
+      font-size: clamp(14px, 2vw, 22px);
+      letter-spacing: 5px;
+      opacity: 0;
+      text-shadow: 0 0 10px var(--subtitleGlow);
+    }
+
+    .play .subtitle { animation: subtitleIn 1.8s ease forwards 4.6s; }
+
+    @keyframes subtitleIn {
+      from { opacity: 0; transform: translateY(25px); filter: blur(5px); }
+      to { opacity: 1; transform: translateY(0); filter: blur(0); }
+    }
+
+    .flash {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, var(--flash), transparent 55%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .play .flash { animation: flashBurst 2s ease-out 2.2s forwards; }
+
+    @keyframes flashBurst {
+      0% { opacity: 0; transform: scale(0.2); }
+      20% { opacity: 1; }
+      100% { opacity: 0; transform: scale(2.6); }
+    }
+
+    .shine {
+      position: absolute;
+      top: 50%;
+      left: -30%;
+      width: 34%;
+      height: 220px;
+      transform: translateY(-50%) skewX(-25deg);
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,0.04),
+        var(--shine),
+        rgba(255,255,255,0.04),
+        transparent
+      );
+      filter: blur(8px);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .play .shine { animation: shineMove 6s ease-in-out infinite 4s; }
+
+    @keyframes shineMove {
+      0% { left: -30%; opacity: 0; }
+      10% { opacity: 1; }
+      50% { left: 100%; opacity: 0.9; }
+      100% { left: 120%; opacity: 0; }
+    }
+
+    .controls {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      z-index: 120;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .left-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .right-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    input[type="text"], select {
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--inputBorder);
+      background: var(--inputBg);
+      color: var(--inputText);
+      outline: none;
+      font-size: 15px;
+    }
+
+    input[type="text"] {
+      min-width: 260px;
+      box-shadow: inset 0 0 10px rgba(255,100,0,0.08);
+    }
+
+    input[type="text"]::placeholder {
+      color: var(--inputPlaceholder);
+    }
+
+    button {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: bold;
+      background: linear-gradient(135deg, var(--btn1), var(--btn2));
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 0 18px var(--btnGlow);
+    }
+
+    .message {
+      position: absolute;
+      top: 86px;
+      left: 20px;
+      z-index: 130;
+      color: var(--messageText);
+      background: var(--messageBg);
+      border: 1px solid var(--messageBorder);
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: 0.25s ease;
+      pointer-events: none;
+    }
+
+    .message.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .helper {
+      color: var(--helper);
+      font-size: 13px;
+      opacity: 0.85;
+      align-self: center;
+    }
+
+    .credit {
+      position: absolute;
+      bottom: 22px;
+      right: 22px;
+      z-index: 140;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      color: rgba(255,240,220,0.9);
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 0 12px rgba(0,0,0,0.2);
+      backdrop-filter: blur(4px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .credit.hidden {
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+    }
+
+    .credit-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--helper);
+      font-size: 14px;
+      background: var(--inputBg);
+      border: 1px solid var(--inputBorder);
+      padding: 10px 12px;
+      border-radius: 12px;
+    }
+
+    .credit-toggle input {
+      accent-color: var(--btn1);
+    }
+
+    .gui-hidden .controls,
+    .gui-hidden .message {
+      opacity: 0;
+      transform: translateY(-10px);
+      pointer-events: none;
+    }
+
+    @media (max-width: 850px) {
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .left-controls, .right-controls {
+        width: 100%;
+      }
+      input[type="text"] {
+        min-width: 200px;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="scene" id="scene">
+    <div class="camera" id="camera">
+      <div class="bg"></div>
+      <div class="grid"></div>
+      <div class="particles" id="particles"></div>
+      <div class="rings" id="rings"></div>
+      <div class="flash"></div>
+      <div class="shine"></div>
+
+      <div class="logo-wrap">
+        <div class="title-text" id="titleText" data-text="Mamo Blox">Mamo Blox</div>
+      </div>
+
+      <div class="subtitle">CUSTOM 3D INTRO</div>
+      <div class="credit" id="creditText">Intro by Mamo Blox</div>
+    </div>
+
+    <div class="controls" id="controls">
+      <div class="left-controls">
+        <input id="textInput" type="text" maxlength="30" placeholder="Type any text..." value="Mamo Blox" />
+        <button id="startBtn">Start Intro</button>
+        <button id="replayBtn">Replay</button>
+      </div>
+
+      <div class="right-controls">
+        <select id="themeSelect">
+          <option value="orange">Orange (original)</option>
+          <option value="blue">Blue</option>
+          <option value="green">Green</option>
+          <option value="pink">Pink</option>
+          <option value="yellow">Yellow</option>
+        </select>
+
+        <label class="credit-toggle">
+          <input type="checkbox" id="toggleCredit" checked />
+          Show credit
+        </label>
+
+        <div class="helper">Press Z + P to hide/show GUI</div>
+      </div>
+    </div>
+
+    <div class="message" id="messageBox">Too long, pick a shorter name/text</div>
+  </div>
+
+  <script>
+    const scene = document.getElementById("scene");
+    const cameraEl = document.getElementById("camera");
+    const particles = document.getElementById("particles");
+    const rings = document.getElementById("rings");
+    const startBtn = document.getElementById("startBtn");
+    const replayBtn = document.getElementById("replayBtn");
+    const textInput = document.getElementById("textInput");
+    const titleText = document.getElementById("titleText");
+    const messageBox = document.getElementById("messageBox");
+    const themeSelect = document.getElementById("themeSelect");
+    const toggleCredit = document.getElementById("toggleCredit");
+    const creditText = document.getElementById("creditText");
+
+    let audioCtx;
+    let currentText = "Mamo Blox";
+    let guiHidden = false;
+    let wakeLock = null;
+    const pressedKeys = new Set();
+
+    const themes = {
+      orange: {
+        "--bg1": "#2b0d00","--bg2": "#120500","--bg3": "#050100",
+        "--orb1": "rgba(255,80,0,0.14)","--orb2": "rgba(255,20,0,0.18)","--orb3": "rgba(255,180,80,0.03)",
+        "--grid1": "rgba(255,90,0,0.09)","--grid2": "rgba(255,120,0,0.09)",
+        "--particle": "#ff7b00","--particleGlow": "#ff5e00","--ring": "rgba(255,110,0,0.15)",
+        "--titleMain": "#ffd6a0","--titleGlow1": "rgba(255,214,160,0.95)","--titleGlow2": "rgba(255,120,0,0.8)",
+        "--titleGlow3": "rgba(255,70,0,0.6)","--titleGlow4": "rgba(255,40,0,0.28)",
+        "--titleBefore": "#b83a00","--titleAfter": "#5f1800",
+        "--subtitle": "rgba(255,220,180,0.94)","--subtitleGlow": "rgba(255,100,0,0.35)",
+        "--flash": "rgba(255,200,120,0.22)","--shine": "rgba(255,220,140,0.22)",
+        "--btn1": "#ff7a00","--btn2": "#b32000","--btnGlow": "rgba(255,100,0,0.25)",
+        "--inputBorder": "rgba(255,160,80,0.3)","--inputBg": "rgba(20, 8, 0, 0.75)",
+        "--inputText": "#ffe2c2","--inputPlaceholder": "rgba(255,210,170,0.6)",
+        "--messageBg": "rgba(40, 10, 0, 0.8)","--messageBorder": "rgba(255,120,0,0.25)",
+        "--messageText": "#ffd6b0","--helper": "#ffd9ba"
+      },
+      blue: {
+        "--bg1": "#08182e","--bg2": "#050c18","--bg3": "#02050a",
+        "--orb1": "rgba(0,140,255,0.14)","--orb2": "rgba(0,70,255,0.18)","--orb3": "rgba(130,220,255,0.03)",
+        "--grid1": "rgba(0,140,255,0.09)","--grid2": "rgba(60,180,255,0.09)",
+        "--particle": "#35b6ff","--particleGlow": "#008cff","--ring": "rgba(0,140,255,0.15)",
+        "--titleMain": "#bfe9ff","--titleGlow1": "rgba(191,233,255,0.95)","--titleGlow2": "rgba(0,160,255,0.8)",
+        "--titleGlow3": "rgba(0,100,255,0.6)","--titleGlow4": "rgba(0,70,255,0.28)",
+        "--titleBefore": "#1f73c9","--titleAfter": "#0e3566",
+        "--subtitle": "rgba(205,235,255,0.94)","--subtitleGlow": "rgba(0,140,255,0.35)",
+        "--flash": "rgba(140,210,255,0.22)","--shine": "rgba(140,220,255,0.22)",
+        "--btn1": "#23a6ff","--btn2": "#0c4db9","--btnGlow": "rgba(0,130,255,0.25)",
+        "--inputBorder": "rgba(90,170,255,0.3)","--inputBg": "rgba(4, 10, 25, 0.75)",
+        "--inputText": "#d9f1ff","--inputPlaceholder": "rgba(180,220,255,0.6)",
+        "--messageBg": "rgba(5, 18, 40, 0.8)","--messageBorder": "rgba(80,150,255,0.25)",
+        "--messageText": "#d5ebff","--helper": "#cde8ff"
+      },
+      green: {
+        "--bg1": "#081f12","--bg2": "#04110a","--bg3": "#010503",
+        "--orb1": "rgba(0,255,120,0.14)","--orb2": "rgba(0,180,90,0.18)","--orb3": "rgba(180,255,210,0.03)",
+        "--grid1": "rgba(0,255,120,0.09)","--grid2": "rgba(90,255,170,0.09)",
+        "--particle": "#28ff9a","--particleGlow": "#00d87f","--ring": "rgba(0,255,120,0.15)",
+        "--titleMain": "#c7ffe0","--titleGlow1": "rgba(199,255,224,0.95)","--titleGlow2": "rgba(0,255,140,0.8)",
+        "--titleGlow3": "rgba(0,200,110,0.6)","--titleGlow4": "rgba(0,120,70,0.28)",
+        "--titleBefore": "#1aa35d","--titleAfter": "#0b4a29",
+        "--subtitle": "rgba(210,255,228,0.94)","--subtitleGlow": "rgba(0,255,130,0.35)",
+        "--flash": "rgba(160,255,210,0.22)","--shine": "rgba(170,255,215,0.22)",
+        "--btn1": "#1dff91","--btn2": "#0b8c4b","--btnGlow": "rgba(0,220,120,0.25)",
+        "--inputBorder": "rgba(100,255,170,0.3)","--inputBg": "rgba(4, 20, 10, 0.75)",
+        "--inputText": "#dcffeb","--inputPlaceholder": "rgba(190,255,220,0.6)",
+        "--messageBg": "rgba(5, 35, 16, 0.8)","--messageBorder": "rgba(80,255,150,0.25)",
+        "--messageText": "#d7ffea","--helper": "#d6ffea"
+      },
+      pink: {
+        "--bg1": "#2b0820","--bg2": "#14050f","--bg3": "#060104",
+        "--orb1": "rgba(255,70,180,0.14)","--orb2": "rgba(255,20,140,0.18)","--orb3": "rgba(255,180,230,0.03)",
+        "--grid1": "rgba(255,70,180,0.09)","--grid2": "rgba(255,120,220,0.09)",
+        "--particle": "#ff4fc3","--particleGlow": "#ff1fa3","--ring": "rgba(255,70,180,0.15)",
+        "--titleMain": "#ffd0ef","--titleGlow1": "rgba(255,208,239,0.95)","--titleGlow2": "rgba(255,80,190,0.8)",
+        "--titleGlow3": "rgba(255,40,150,0.6)","--titleGlow4": "rgba(255,20,120,0.28)",
+        "--titleBefore": "#b52f7e","--titleAfter": "#5c1740",
+        "--subtitle": "rgba(255,220,245,0.94)","--subtitleGlow": "rgba(255,70,180,0.35)",
+        "--flash": "rgba(255,180,230,0.22)","--shine": "rgba(255,190,235,0.22)",
+        "--btn1": "#ff5cc7","--btn2": "#b31372","--btnGlow": "rgba(255,70,180,0.25)",
+        "--inputBorder": "rgba(255,130,210,0.3)","--inputBg": "rgba(25, 4, 18, 0.75)",
+        "--inputText": "#ffe0f4","--inputPlaceholder": "rgba(255,200,230,0.6)",
+        "--messageBg": "rgba(40, 8, 28, 0.8)","--messageBorder": "rgba(255,120,200,0.25)",
+        "--messageText": "#ffd8f0","--helper": "#ffd8f0"
+      },
+      yellow: {
+        "--bg1": "#2b2500","--bg2": "#141000","--bg3": "#050400",
+        "--orb1": "rgba(255,220,0,0.14)","--orb2": "rgba(255,180,0,0.18)","--orb3": "rgba(255,245,180,0.03)",
+        "--grid1": "rgba(255,220,0,0.09)","--grid2": "rgba(255,235,80,0.09)",
+        "--particle": "#ffd93a","--particleGlow": "#ffbf00","--ring": "rgba(255,220,0,0.15)",
+        "--titleMain": "#fff1b0","--titleGlow1": "rgba(255,241,176,0.95)","--titleGlow2": "rgba(255,220,0,0.8)",
+        "--titleGlow3": "rgba(255,190,0,0.6)","--titleGlow4": "rgba(255,150,0,0.28)",
+        "--titleBefore": "#b59200","--titleAfter": "#5f4700",
+        "--subtitle": "rgba(255,245,190,0.94)","--subtitleGlow": "rgba(255,210,0,0.35)",
+        "--flash": "rgba(255,245,150,0.22)","--shine": "rgba(255,240,150,0.22)",
+        "--btn1": "#ffd83a","--btn2": "#b38200","--btnGlow": "rgba(255,210,0,0.25)",
+        "--inputBorder": "rgba(255,220,100,0.3)","--inputBg": "rgba(25, 20, 2, 0.75)",
+        "--inputText": "#fff4cb","--inputPlaceholder": "rgba(255,240,180,0.6)",
+        "--messageBg": "rgba(45, 35, 4, 0.8)","--messageBorder": "rgba(255,220,80,0.25)",
+        "--messageText": "#fff0bf","--helper": "#fff0bf"
+      }
+    };
+
+    function applyTheme(name) {
+      const theme = themes[name] || themes.orange;
+      for (const key in theme) {
+        document.documentElement.style.setProperty(key, theme[key]);
+      }
+    }
+
+    function showMessage(msg) {
+      if (guiHidden) return;
+      messageBox.textContent = msg;
+      messageBox.classList.add("show");
+      clearTimeout(showMessage._t);
+      showMessage._t = setTimeout(() => {
+        messageBox.classList.remove("show");
+      }, 2400);
+    }
+
+    function buildParticles() {
+      particles.innerHTML = "";
+      for (let i = 0; i < 85; i++) {
+        const p = document.createElement("div");
+        p.className = "particle";
+        const size = 2 + Math.random() * 7;
+        p.style.width = size + "px";
+        p.style.height = size + "px";
+        p.style.left = Math.random() * 100 + "vw";
+        p.style.top = Math.random() * 100 + "vh";
+        p.style.animationDuration = (4 + Math.random() * 6) + "s";
+        p.style.animationDelay = (Math.random() * 8) + "s";
+        p.style.opacity = Math.random();
+        particles.appendChild(p);
+      }
+    }
+
+    function buildRings() {
+      rings.innerHTML = "";
+      for (let i = 0; i < 4; i++) {
+        const ring = document.createElement("div");
+        ring.className = "ring";
+        ring.style.animationDelay = (i * 1.2) + "s";
+        rings.appendChild(ring);
+      }
+    }
+
+    function strongShake(intensity = 18, duration = 550) {
+      const start = performance.now();
+
+      function frame(now) {
+        const elapsed = now - start;
+        const t = elapsed / duration;
+        if (t >= 1) {
+          cameraEl.style.transform = "";
+          return;
+        }
+
+        const damper = 1 - t;
+        const x = (Math.random() - 0.5) * intensity * 2 * damper;
+        const y = (Math.random() - 0.5) * intensity * 2 * damper;
+        const r = (Math.random() - 0.5) * intensity * 0.08 * damper;
+
+        cameraEl.style.transform = `translate(${x}px, ${y}px) rotate(${r}deg) scale(${1 + damper * 0.01})`;
+        requestAnimationFrame(frame);
+      }
+
+      requestAnimationFrame(frame);
+    }
+
+    async function requestWakeLock() {
+      try {
+        if ("wakeLock" in navigator) {
+          wakeLock = await navigator.wakeLock.request("screen");
+          console.log("Wake Lock active");
+
+          wakeLock.addEventListener("release", () => {
+            console.log("Wake Lock released");
+          });
+        } else {
+          console.log("Wake Lock API not supported");
+        }
+      } catch (err) {
+        console.error("Wake Lock error:", err);
+      }
+    }
+
+    document.addEventListener("visibilitychange", async () => {
+      if (document.visibilityState === "visible" && wakeLock !== null) {
+        await requestWakeLock();
+      }
+    });
+
+    function ensureAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playTone(freq, type, start, duration, volume) {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, start);
+
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(volume, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(start);
+      osc.stop(start + duration);
+    }
+
+    function playWhoosh(startTime) {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const filter = audioCtx.createBiquadFilter();
+
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(80, startTime);
+      osc.frequency.exponentialRampToValueAtTime(1000, startTime + 1.2);
+
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(250, startTime);
+      filter.frequency.exponentialRampToValueAtTime(4500, startTime + 1.2);
+
+      gain.gain.setValueAtTime(0.0001, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.16, startTime + 0.06);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 1.2);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + 1.2);
+    }
+
+    function playImpact(startTime, freq = 150, vol = 0.22) {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = "square";
+      osc.frequency.setValueAtTime(freq, startTime);
+      osc.frequency.exponentialRampToValueAtTime(40, startTime + 0.5);
+
+      gain.gain.setValueAtTime(0.0001, startTime);
+      gain.gain.exponentialRampToValueAtTime(vol, startTime + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.5);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + 0.5);
+    }
+
+    function playBassDrop(startTime) {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const filter = audioCtx.createBiquadFilter();
+
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(200, startTime);
+      osc.frequency.exponentialRampToValueAtTime(30, startTime + 1.25);
+
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(170, startTime);
+      filter.frequency.exponentialRampToValueAtTime(60, startTime + 1.25);
+
+      gain.gain.setValueAtTime(0.0001, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.34, startTime + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 1.25);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + 1.25);
+    }
+
+    function playAmbient(startTime, delay, freq) {
+      playTone(freq, "sine", startTime + delay, 1.7, 0.03);
+      playTone(freq * 2, "triangle", startTime + delay, 1.1, 0.018);
+    }
+
+    function playIntroAudio() {
+      ensureAudio();
+      const now = audioCtx.currentTime;
+
+      playWhoosh(now + 0.05);
+      playTone(196, "triangle", now + 1.0, 0.45, 0.05);
+      playTone(261.63, "triangle", now + 1.5, 0.55, 0.06);
+      playTone(329.63, "triangle", now + 2.1, 0.6, 0.07);
+
+      playImpact(now + 2.3, 140, 0.18);
+      playBassDrop(now + 2.55);
+      playImpact(now + 2.55, 90, 0.3);
+
+      playAmbient(now, 0.8, 110);
+      playAmbient(now, 2.0, 146.83);
+      playAmbient(now, 3.6, 174.61);
+
+      playTone(392, "square", now + 4.0, 0.35, 0.08);
+      playTone(523.25, "square", now + 4.35, 0.35, 0.085);
+      playTone(659.25, "square", now + 4.7, 1.0, 0.09);
+    }
+
+    function fitText(text) {
+      const clean = text.trim();
+      if (!clean) return { ok: false, reason: "Type something first" };
+
+      titleText.style.fontSize = "";
+      titleText.textContent = clean;
+      titleText.setAttribute("data-text", clean);
+
+      const wrapWidth = document.querySelector(".logo-wrap").clientWidth * 0.9;
+      let fontSize = Math.min(window.innerWidth * 0.09, 150);
+      let fits = false;
+
+      for (let i = 0; i < 60; i++) {
+        titleText.style.fontSize = fontSize + "px";
+        titleText.style.letterSpacing = Math.max(2, fontSize * 0.055) + "px";
+
+        const width = titleText.getBoundingClientRect().width;
+        if (width <= wrapWidth) {
+          fits = true;
+          break;
+        }
+        fontSize -= 2.5;
+      }
+
+      if (!fits || fontSize < 26) {
+        return { ok: false, reason: "Too long, pick a shorter name/text" };
+      }
+
+      return { ok: true, text: clean };
+    }
+
+    function resetIntro() {
+      scene.classList.remove("play");
+      cameraEl.style.transform = "";
+      void scene.offsetWidth;
+      buildParticles();
+      buildRings();
+    }
+
+    function startIntro(text) {
+      const result = fitText(text);
+      if (!result.ok) {
+        showMessage(result.reason);
+        return;
+      }
+
+      currentText = result.text;
+      resetIntro();
+      scene.classList.add("play");
+      playIntroAudio();
+
+      setTimeout(() => strongShake(10, 350), 1400);
+      setTimeout(() => strongShake(26, 700), 2550);
+      setTimeout(() => strongShake(12, 450), 4700);
+    }
+
+    function toggleGUI() {
+      guiHidden = !guiHidden;
+      if (guiHidden) {
+        scene.classList.add("gui-hidden");
+        messageBox.classList.remove("show");
+      } else {
+        scene.classList.remove("gui-hidden");
+      }
+    }
+
+    startBtn.addEventListener("click", async () => {
+      await requestWakeLock();
+      startIntro(textInput.value);
+    });
+
+    replayBtn.addEventListener("click", async () => {
+      await requestWakeLock();
+      startIntro(currentText || textInput.value);
+    });
+
+    textInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") startIntro(textInput.value);
+    });
+
+    themeSelect.addEventListener("change", () => {
+      applyTheme(themeSelect.value);
+    });
+
+    toggleCredit.addEventListener("change", () => {
+      if (toggleCredit.checked) {
+        creditText.classList.remove("hidden");
+      } else {
+        creditText.classList.add("hidden");
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      pressedKeys.add(e.key.toLowerCase());
+
+      if (pressedKeys.has("z") && pressedKeys.has("p")) {
+        toggleGUI();
+        pressedKeys.clear();
+      }
+    });
+
+    document.addEventListener("keyup", (e) => {
+      pressedKeys.delete(e.key.toLowerCase());
+    });
+
+    window.addEventListener("resize", () => {
+      fitText(currentText || textInput.value || "Mamo Blox");
+    });
+
+    applyTheme("orange");
+    buildParticles();
+    buildRings();
+    fitText(currentText);
+  </script>
+</body>
+</html>

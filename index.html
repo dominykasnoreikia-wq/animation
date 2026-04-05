@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Custom 3D Intro Studio</title>
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -60,6 +60,11 @@
 
       --helper: #ffd9ba;
       --accent: #ff7a00;
+
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
     }
 
     html, body {
@@ -67,18 +72,21 @@
       height: 100%;
       overflow: hidden;
       background: #000;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
       font-family: Arial, sans-serif;
       background:
         radial-gradient(circle at center, var(--bg1) 0%, var(--bg2) 45%, var(--bg3) 75%, #000 100%);
+      touch-action: manipulation;
     }
 
     .scene {
       position: relative;
       width: 100%;
-      height: 100%;
+      height: 100dvh;
+      min-height: 100vh;
       overflow: hidden;
       perspective: 1600px;
     }
@@ -175,7 +183,8 @@
       justify-content: center;
       align-items: center;
       transform-style: preserve-3d;
-      padding: 0 5vw;
+      padding: 0 clamp(12px, 5vw, 70px);
+      overflow: hidden;
     }
 
     .title-text {
@@ -188,6 +197,7 @@
       transform-style: preserve-3d;
       text-align: center;
       white-space: nowrap;
+      max-width: 100%;
       text-shadow:
         0 0 10px var(--titleGlow1),
         0 0 20px var(--titleGlow2),
@@ -274,7 +284,6 @@
       }
     }
 
-    /* extra entrance animations */
     .play.anim-zoom .title-text {
       animation:
         animZoomIn 4.8s cubic-bezier(.2,.8,.2,1) forwards,
@@ -311,123 +320,60 @@
     }
 
     @keyframes animZoomIn {
-      0% {
-        opacity: 0;
-        transform: scale(0.05) translateZ(-900px);
-        filter: blur(25px);
-      }
-      50% {
-        opacity: 0.9;
-        transform: scale(1.18) translateZ(100px);
-        filter: blur(2px);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1) translateZ(0);
-        filter: blur(0);
-      }
+      0% { opacity: 0; transform: scale(0.05) translateZ(-900px); filter: blur(25px); }
+      50% { opacity: 0.9; transform: scale(1.18) translateZ(100px); filter: blur(2px); }
+      100% { opacity: 1; transform: scale(1) translateZ(0); filter: blur(0); }
     }
 
     @keyframes animSlideLeft {
-      0% {
-        opacity: 0;
-        transform: translateX(-900px) rotateY(55deg) scale(0.6);
-        filter: blur(16px);
-      }
-      65% {
-        opacity: 1;
-        transform: translateX(30px) rotateY(-8deg) scale(1.05);
-        filter: blur(0);
-      }
-      100% {
-        opacity: 1;
-        transform: translateX(0) rotateY(0deg) scale(1);
-        filter: blur(0);
-      }
+      0% { opacity: 0; transform: translateX(-900px) rotateY(55deg) scale(0.6); filter: blur(16px); }
+      65% { opacity: 1; transform: translateX(30px) rotateY(-8deg) scale(1.05); filter: blur(0); }
+      100% { opacity: 1; transform: translateX(0) rotateY(0deg) scale(1); filter: blur(0); }
     }
 
     @keyframes animSlideTop {
-      0% {
-        opacity: 0;
-        transform: translateY(-500px) rotateX(70deg) scale(0.55);
-        filter: blur(18px);
-      }
-      65% {
-        opacity: 1;
-        transform: translateY(25px) rotateX(-8deg) scale(1.05);
-        filter: blur(0);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0) rotateX(0deg) scale(1);
-        filter: blur(0);
-      }
+      0% { opacity: 0; transform: translateY(-500px) rotateX(70deg) scale(0.55); filter: blur(18px); }
+      65% { opacity: 1; transform: translateY(25px) rotateX(-8deg) scale(1.05); filter: blur(0); }
+      100% { opacity: 1; transform: translateY(0) rotateX(0deg) scale(1); filter: blur(0); }
     }
 
     @keyframes animSpinIn {
-      0% {
-        opacity: 0;
-        transform: rotateX(360deg) rotateY(360deg) scale(0.2);
-        filter: blur(18px);
-      }
-      70% {
-        opacity: 1;
-        transform: rotateX(-15deg) rotateY(10deg) scale(1.08);
-        filter: blur(0);
-      }
-      100% {
-        opacity: 1;
-        transform: rotateX(0deg) rotateY(0deg) scale(1);
-        filter: blur(0);
-      }
+      0% { opacity: 0; transform: rotateX(360deg) rotateY(360deg) scale(0.2); filter: blur(18px); }
+      70% { opacity: 1; transform: rotateX(-15deg) rotateY(10deg) scale(1.08); filter: blur(0); }
+      100% { opacity: 1; transform: rotateX(0deg) rotateY(0deg) scale(1); filter: blur(0); }
     }
 
     @keyframes animBounceIn {
-      0% {
-        opacity: 0;
-        transform: translateY(350px) scale(0.45);
-        filter: blur(16px);
-      }
-      50% {
-        opacity: 1;
-        transform: translateY(-35px) scale(1.08);
-        filter: blur(0);
-      }
-      72% {
-        transform: translateY(18px) scale(0.97);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: blur(0);
-      }
+      0% { opacity: 0; transform: translateY(350px) scale(0.45); filter: blur(16px); }
+      50% { opacity: 1; transform: translateY(-35px) scale(1.08); filter: blur(0); }
+      72% { transform: translateY(18px) scale(0.97); }
+      100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
     }
 
     .subtitle {
       position: absolute;
-      bottom: 13%;
+      left: 0;
+      right: 0;
+      bottom: max(13%, calc(78px + var(--safe-bottom)));
       width: 100%;
       text-align: center;
       color: var(--subtitle);
-      font-size: clamp(14px, 2vw, 22px);
-      letter-spacing: 5px;
+      font-size: clamp(12px, 2.5vw, 22px);
+      letter-spacing: clamp(2px, 0.8vw, 5px);
       opacity: 0;
       text-shadow: 0 0 10px var(--subtitleGlow);
       font-family: Arial, sans-serif;
+      padding: 0 14px;
     }
 
     .play .subtitle { animation: subtitleIn 1.8s ease forwards 4.6s; }
 
     .play.anim-slide-left .subtitle,
     .play.anim-slide-top .subtitle,
-    .play.anim-bounce .subtitle {
-      animation-delay: 3.5s;
-    }
+    .play.anim-bounce .subtitle { animation-delay: 3.5s; }
 
     .play.anim-spin .subtitle,
-    .play.anim-zoom .subtitle {
-      animation-delay: 4.1s;
-    }
+    .play.anim-zoom .subtitle { animation-delay: 4.1s; }
 
     @keyframes subtitleIn {
       from { opacity: 0; transform: translateY(25px); filter: blur(5px); }
@@ -446,14 +392,10 @@
 
     .play.anim-slide-left .flash,
     .play.anim-slide-top .flash,
-    .play.anim-bounce .flash {
-      animation-delay: 1.7s;
-    }
+    .play.anim-bounce .flash { animation-delay: 1.7s; }
 
     .play.anim-spin .flash,
-    .play.anim-zoom .flash {
-      animation-delay: 2s;
-    }
+    .play.anim-zoom .flash { animation-delay: 2s; }
 
     @keyframes flashBurst {
       0% { opacity: 0; transform: scale(0.2); }
@@ -492,15 +434,19 @@
 
     .controls {
       position: absolute;
-      top: 20px;
-      left: 20px;
-      right: 20px;
+      top: calc(12px + var(--safe-top));
+      left: calc(12px + var(--safe-left));
+      right: calc(12px + var(--safe-right));
       z-index: 120;
       display: flex;
       justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
       transition: opacity 0.25s ease, transform 0.25s ease;
+      max-height: min(48dvh, 420px);
+      overflow: auto;
+      scrollbar-width: thin;
+      padding-right: 2px;
     }
 
     .left-controls, .right-controls {
@@ -518,10 +464,11 @@
       color: var(--inputText);
       outline: none;
       font-size: 15px;
+      min-height: 46px;
     }
 
     input[type="text"] {
-      min-width: 260px;
+      min-width: 220px;
       box-shadow: inset 0 0 10px rgba(255,100,0,0.08);
     }
 
@@ -530,7 +477,8 @@
     }
 
     button {
-      padding: 12px 18px;
+      padding: 12px 16px;
+      min-height: 46px;
       border: none;
       border-radius: 12px;
       font-size: 15px;
@@ -539,6 +487,7 @@
       color: white;
       cursor: pointer;
       box-shadow: 0 0 18px var(--btnGlow);
+      touch-action: manipulation;
     }
 
     button:hover {
@@ -547,8 +496,9 @@
 
     .message {
       position: absolute;
-      top: 86px;
-      left: 20px;
+      top: calc(78px + var(--safe-top));
+      left: calc(12px + var(--safe-left));
+      right: calc(12px + var(--safe-right));
       z-index: 130;
       color: var(--messageText);
       background: var(--messageBg);
@@ -560,6 +510,8 @@
       transform: translateY(-8px);
       transition: 0.25s ease;
       pointer-events: none;
+      width: fit-content;
+      max-width: min(90vw, 420px);
     }
 
     .message.show {
@@ -576,8 +528,8 @@
 
     .credit {
       position: absolute;
-      bottom: 22px;
-      right: 22px;
+      bottom: calc(12px + var(--safe-bottom));
+      right: calc(12px + var(--safe-right));
       z-index: 140;
       padding: 8px 12px;
       border-radius: 10px;
@@ -588,6 +540,8 @@
       box-shadow: 0 0 12px rgba(0,0,0,0.2);
       backdrop-filter: blur(4px);
       transition: opacity 0.25s ease, transform 0.25s ease;
+      max-width: 70vw;
+      text-align: right;
     }
 
     .credit.hidden {
@@ -606,10 +560,12 @@
       border: 1px solid var(--inputBorder);
       padding: 10px 12px;
       border-radius: 12px;
+      min-height: 46px;
     }
 
     .credit-toggle input {
       accent-color: var(--accent);
+      transform: scale(1.1);
     }
 
     .gui-hidden .controls,
@@ -621,8 +577,8 @@
 
     .studio-note {
       position: absolute;
-      bottom: 20px;
-      left: 20px;
+      bottom: calc(12px + var(--safe-bottom));
+      left: calc(12px + var(--safe-left));
       z-index: 120;
       color: var(--helper);
       font-size: 12px;
@@ -632,6 +588,7 @@
       padding: 8px 12px;
       border: 1px solid var(--inputBorder);
       border-radius: 10px;
+      max-width: 65vw;
     }
 
     .gui-hidden .studio-note {
@@ -640,7 +597,7 @@
       pointer-events: none;
     }
 
-    @media (max-width: 1000px) {
+    @media (max-width: 1200px) {
       .controls {
         flex-direction: column;
         align-items: stretch;
@@ -648,9 +605,115 @@
       .left-controls, .right-controls {
         width: 100%;
       }
-      input[type="text"] {
-        min-width: 200px;
+    }
+
+    @media (max-width: 768px) {
+      .controls {
+        top: calc(8px + var(--safe-top));
+        left: calc(8px + var(--safe-left));
+        right: calc(8px + var(--safe-right));
+        gap: 8px;
+        max-height: min(52dvh, 420px);
+      }
+
+      .left-controls, .right-controls {
+        display: grid;
+        grid-template-columns: 1fr;
         width: 100%;
+        gap: 8px;
+      }
+
+      input[type="text"], select, button, .credit-toggle {
+        width: 100%;
+        min-width: 0;
+        font-size: 16px;
+      }
+
+      button {
+        padding: 13px 14px;
+      }
+
+      .helper {
+        text-align: center;
+        padding: 4px 6px;
+      }
+
+      .studio-note {
+        left: calc(8px + var(--safe-left));
+        right: calc(8px + var(--safe-right));
+        bottom: calc(8px + var(--safe-bottom));
+        max-width: none;
+        font-size: 11px;
+        text-align: center;
+      }
+
+      .credit {
+        right: calc(8px + var(--safe-right));
+        bottom: calc(54px + var(--safe-bottom));
+        font-size: 12px;
+        max-width: 78vw;
+      }
+
+      .subtitle {
+        bottom: calc(46px + var(--safe-bottom));
+        font-size: clamp(11px, 3.3vw, 16px);
+      }
+
+      .title-text::before {
+        transform: translateZ(-20px) translate(5px, 5px);
+      }
+
+      .title-text::after {
+        transform: translateZ(-40px) translate(10px, 10px);
+      }
+
+      .message {
+        top: auto;
+        bottom: calc(92px + var(--safe-bottom));
+        left: calc(8px + var(--safe-left));
+        right: calc(8px + var(--safe-right));
+        width: auto;
+        max-width: none;
+        font-size: 13px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .logo-wrap {
+        padding: 0 10px;
+      }
+
+      .subtitle {
+        letter-spacing: 2px;
+      }
+
+      .credit {
+        font-size: 11px;
+        padding: 7px 10px;
+      }
+
+      .studio-note {
+        font-size: 10px;
+        padding: 7px 10px;
+      }
+
+      .message {
+        font-size: 12px;
+        padding: 9px 11px;
+      }
+    }
+
+    @media (max-height: 700px) and (max-width: 900px) {
+      .controls {
+        max-height: 58dvh;
+      }
+
+      .subtitle {
+        bottom: calc(40px + var(--safe-bottom));
+      }
+
+      .credit {
+        bottom: calc(46px + var(--safe-bottom));
       }
     }
   </style>
@@ -723,7 +786,7 @@
       </div>
     </div>
 
-    <div class="studio-note">Settings auto-save • Screenshot supported • 6 animations</div>
+    <div class="studio-note">Mobile friendly • Auto-save • Screenshot supported • 6 animations</div>
     <div class="message" id="messageBox">Too long, pick a shorter name/text</div>
   </div>
 
@@ -751,185 +814,20 @@
     let guiHidden = false;
     const pressedKeys = new Set();
 
-    const STORAGE_KEY = "mamo_blox_intro_studio_settings_v2";
+    const STORAGE_KEY = "mamo_blox_intro_studio_mobile_v1";
 
     const themes = {
-      orange: {
-        "--bg1": "#2b0d00","--bg2": "#120500","--bg3": "#050100",
-        "--orb1": "rgba(255,80,0,0.14)","--orb2": "rgba(255,20,0,0.18)","--orb3": "rgba(255,180,80,0.03)",
-        "--grid1": "rgba(255,90,0,0.09)","--grid2": "rgba(255,120,0,0.09)",
-        "--particle": "#ff7b00","--particleGlow": "#ff5e00","--ring": "rgba(255,110,0,0.15)",
-        "--titleMain": "#ffd6a0","--titleGlow1": "rgba(255,214,160,0.95)","--titleGlow2": "rgba(255,120,0,0.8)",
-        "--titleGlow3": "rgba(255,70,0,0.6)","--titleGlow4": "rgba(255,40,0,0.28)",
-        "--titleBefore": "#b83a00","--titleAfter": "#5f1800",
-        "--subtitle": "rgba(255,220,180,0.94)","--subtitleGlow": "rgba(255,100,0,0.35)",
-        "--flash": "rgba(255,200,120,0.22)","--shine": "rgba(255,220,140,0.22)",
-        "--btn1": "#ff7a00","--btn2": "#b32000","--btnGlow": "rgba(255,100,0,0.25)",
-        "--inputBorder": "rgba(255,160,80,0.3)","--inputBg": "rgba(20, 8, 0, 0.75)",
-        "--inputText": "#ffe2c2","--inputPlaceholder": "rgba(255,210,170,0.6)",
-        "--messageBg": "rgba(40, 10, 0, 0.8)","--messageBorder": "rgba(255,120,0,0.25)",
-        "--messageText": "#ffd6b0","--helper": "#ffd9ba","--accent": "#ff7a00"
-      },
-      blue: {
-        "--bg1": "#08182e","--bg2": "#050c18","--bg3": "#02050a",
-        "--orb1": "rgba(0,140,255,0.14)","--orb2": "rgba(0,70,255,0.18)","--orb3": "rgba(130,220,255,0.03)",
-        "--grid1": "rgba(0,140,255,0.09)","--grid2": "rgba(60,180,255,0.09)",
-        "--particle": "#35b6ff","--particleGlow": "#008cff","--ring": "rgba(0,140,255,0.15)",
-        "--titleMain": "#bfe9ff","--titleGlow1": "rgba(191,233,255,0.95)","--titleGlow2": "rgba(0,160,255,0.8)",
-        "--titleGlow3": "rgba(0,100,255,0.6)","--titleGlow4": "rgba(0,70,255,0.28)",
-        "--titleBefore": "#1f73c9","--titleAfter": "#0e3566",
-        "--subtitle": "rgba(205,235,255,0.94)","--subtitleGlow": "rgba(0,140,255,0.35)",
-        "--flash": "rgba(140,210,255,0.22)","--shine": "rgba(140,220,255,0.22)",
-        "--btn1": "#23a6ff","--btn2": "#0c4db9","--btnGlow": "rgba(0,130,255,0.25)",
-        "--inputBorder": "rgba(90,170,255,0.3)","--inputBg": "rgba(4, 10, 25, 0.75)",
-        "--inputText": "#d9f1ff","--inputPlaceholder": "rgba(180,220,255,0.6)",
-        "--messageBg": "rgba(5, 18, 40, 0.8)","--messageBorder": "rgba(80,150,255,0.25)",
-        "--messageText": "#d5ebff","--helper": "#cde8ff","--accent": "#23a6ff"
-      },
-      green: {
-        "--bg1": "#081f12","--bg2": "#04110a","--bg3": "#010503",
-        "--orb1": "rgba(0,255,120,0.14)","--orb2": "rgba(0,180,90,0.18)","--orb3": "rgba(180,255,210,0.03)",
-        "--grid1": "rgba(0,255,120,0.09)","--grid2": "rgba(90,255,170,0.09)",
-        "--particle": "#28ff9a","--particleGlow": "#00d87f","--ring": "rgba(0,255,120,0.15)",
-        "--titleMain": "#c7ffe0","--titleGlow1": "rgba(199,255,224,0.95)","--titleGlow2": "rgba(0,255,140,0.8)",
-        "--titleGlow3": "rgba(0,200,110,0.6)","--titleGlow4": "rgba(0,120,70,0.28)",
-        "--titleBefore": "#1aa35d","--titleAfter": "#0b4a29",
-        "--subtitle": "rgba(210,255,228,0.94)","--subtitleGlow": "rgba(0,255,130,0.35)",
-        "--flash": "rgba(160,255,210,0.22)","--shine": "rgba(170,255,215,0.22)",
-        "--btn1": "#1dff91","--btn2": "#0b8c4b","--btnGlow": "rgba(0,220,120,0.25)",
-        "--inputBorder": "rgba(100,255,170,0.3)","--inputBg": "rgba(4, 20, 10, 0.75)",
-        "--inputText": "#dcffeb","--inputPlaceholder": "rgba(190,255,220,0.6)",
-        "--messageBg": "rgba(5, 35, 16, 0.8)","--messageBorder": "rgba(80,255,150,0.25)",
-        "--messageText": "#d7ffea","--helper": "#d6ffea","--accent": "#1dff91"
-      },
-      pink: {
-        "--bg1": "#2b0820","--bg2": "#14050f","--bg3": "#060104",
-        "--orb1": "rgba(255,70,180,0.14)","--orb2": "rgba(255,20,140,0.18)","--orb3": "rgba(255,180,230,0.03)",
-        "--grid1": "rgba(255,70,180,0.09)","--grid2": "rgba(255,120,220,0.09)",
-        "--particle": "#ff4fc3","--particleGlow": "#ff1fa3","--ring": "rgba(255,70,180,0.15)",
-        "--titleMain": "#ffd0ef","--titleGlow1": "rgba(255,208,239,0.95)","--titleGlow2": "rgba(255,80,190,0.8)",
-        "--titleGlow3": "rgba(255,40,150,0.6)","--titleGlow4": "rgba(255,20,120,0.28)",
-        "--titleBefore": "#b52f7e","--titleAfter": "#5c1740",
-        "--subtitle": "rgba(255,220,245,0.94)","--subtitleGlow": "rgba(255,70,180,0.35)",
-        "--flash": "rgba(255,180,230,0.22)","--shine": "rgba(255,190,235,0.22)",
-        "--btn1": "#ff5cc7","--btn2": "#b31372","--btnGlow": "rgba(255,70,180,0.25)",
-        "--inputBorder": "rgba(255,130,210,0.3)","--inputBg": "rgba(25, 4, 18, 0.75)",
-        "--inputText": "#ffe0f4","--inputPlaceholder": "rgba(255,200,230,0.6)",
-        "--messageBg": "rgba(40, 8, 28, 0.8)","--messageBorder": "rgba(255,120,200,0.25)",
-        "--messageText": "#ffd8f0","--helper": "#ffd8f0","--accent": "#ff5cc7"
-      },
-      yellow: {
-        "--bg1": "#2b2500","--bg2": "#141000","--bg3": "#050400",
-        "--orb1": "rgba(255,220,0,0.14)","--orb2": "rgba(255,180,0,0.18)","--orb3": "rgba(255,245,180,0.03)",
-        "--grid1": "rgba(255,220,0,0.09)","--grid2": "rgba(255,235,80,0.09)",
-        "--particle": "#ffd93a","--particleGlow": "#ffbf00","--ring": "rgba(255,220,0,0.15)",
-        "--titleMain": "#fff1b0","--titleGlow1": "rgba(255,241,176,0.95)","--titleGlow2": "rgba(255,220,0,0.8)",
-        "--titleGlow3": "rgba(255,190,0,0.6)","--titleGlow4": "rgba(255,150,0,0.28)",
-        "--titleBefore": "#b59200","--titleAfter": "#5f4700",
-        "--subtitle": "rgba(255,245,190,0.94)","--subtitleGlow": "rgba(255,210,0,0.35)",
-        "--flash": "rgba(255,245,150,0.22)","--shine": "rgba(255,240,150,0.22)",
-        "--btn1": "#ffd83a","--btn2": "#b38200","--btnGlow": "rgba(255,210,0,0.25)",
-        "--inputBorder": "rgba(255,220,100,0.3)","--inputBg": "rgba(25, 20, 2, 0.75)",
-        "--inputText": "#fff4cb","--inputPlaceholder": "rgba(255,240,180,0.6)",
-        "--messageBg": "rgba(45, 35, 4, 0.8)","--messageBorder": "rgba(255,220,80,0.25)",
-        "--messageText": "#fff0bf","--helper": "#fff0bf","--accent": "#ffd83a"
-      },
-      red: {
-        "--bg1": "#240707","--bg2": "#120303","--bg3": "#040101",
-        "--orb1": "rgba(255,70,70,0.14)","--orb2": "rgba(200,0,0,0.18)","--orb3": "rgba(255,180,180,0.03)",
-        "--grid1": "rgba(255,50,50,0.09)","--grid2": "rgba(255,90,90,0.09)",
-        "--particle": "#ff4545","--particleGlow": "#ff2020","--ring": "rgba(255,70,70,0.15)",
-        "--titleMain": "#ffd2d2","--titleGlow1": "rgba(255,210,210,0.95)","--titleGlow2": "rgba(255,60,60,0.8)",
-        "--titleGlow3": "rgba(255,20,20,0.6)","--titleGlow4": "rgba(180,0,0,0.28)",
-        "--titleBefore": "#aa1f1f","--titleAfter": "#541010",
-        "--subtitle": "rgba(255,220,220,0.94)","--subtitleGlow": "rgba(255,80,80,0.35)",
-        "--flash": "rgba(255,170,170,0.22)","--shine": "rgba(255,180,180,0.22)",
-        "--btn1": "#ff4a4a","--btn2": "#a80000","--btnGlow": "rgba(255,70,70,0.25)",
-        "--inputBorder": "rgba(255,130,130,0.3)","--inputBg": "rgba(25, 5, 5, 0.75)",
-        "--inputText": "#ffe3e3","--inputPlaceholder": "rgba(255,200,200,0.6)",
-        "--messageBg": "rgba(40, 8, 8, 0.8)","--messageBorder": "rgba(255,90,90,0.25)",
-        "--messageText": "#ffd6d6","--helper": "#ffd6d6","--accent": "#ff4a4a"
-      },
-      purple: {
-        "--bg1": "#180824","--bg2": "#0b0414","--bg3": "#030106",
-        "--orb1": "rgba(170,80,255,0.14)","--orb2": "rgba(120,0,255,0.18)","--orb3": "rgba(220,180,255,0.03)",
-        "--grid1": "rgba(180,90,255,0.09)","--grid2": "rgba(210,130,255,0.09)",
-        "--particle": "#bb68ff","--particleGlow": "#9c35ff","--ring": "rgba(170,80,255,0.15)",
-        "--titleMain": "#ead5ff","--titleGlow1": "rgba(234,213,255,0.95)","--titleGlow2": "rgba(180,90,255,0.8)",
-        "--titleGlow3": "rgba(130,40,255,0.6)","--titleGlow4": "rgba(90,0,180,0.28)",
-        "--titleBefore": "#7431b3","--titleAfter": "#3a145b",
-        "--subtitle": "rgba(240,225,255,0.94)","--subtitleGlow": "rgba(180,90,255,0.35)",
-        "--flash": "rgba(220,180,255,0.22)","--shine": "rgba(225,190,255,0.22)",
-        "--btn1": "#b86bff","--btn2": "#5b18a8","--btnGlow": "rgba(170,80,255,0.25)",
-        "--inputBorder": "rgba(190,130,255,0.3)","--inputBg": "rgba(15, 5, 28, 0.75)",
-        "--inputText": "#efe0ff","--inputPlaceholder": "rgba(220,190,255,0.6)",
-        "--messageBg": "rgba(20, 8, 40, 0.8)","--messageBorder": "rgba(170,110,255,0.25)",
-        "--messageText": "#ead8ff","--helper": "#ead8ff","--accent": "#b86bff"
-      },
-      ice: {
-        "--bg1": "#081a1f","--bg2": "#041014","--bg3": "#010607",
-        "--orb1": "rgba(120,240,255,0.14)","--orb2": "rgba(70,200,255,0.18)","--orb3": "rgba(220,255,255,0.03)",
-        "--grid1": "rgba(140,240,255,0.09)","--grid2": "rgba(180,255,255,0.09)",
-        "--particle": "#90f5ff","--particleGlow": "#4be7ff","--ring": "rgba(140,240,255,0.15)",
-        "--titleMain": "#e8fdff","--titleGlow1": "rgba(232,253,255,0.95)","--titleGlow2": "rgba(130,245,255,0.8)",
-        "--titleGlow3": "rgba(80,220,255,0.6)","--titleGlow4": "rgba(50,160,220,0.28)",
-        "--titleBefore": "#57a7b5","--titleAfter": "#24515a",
-        "--subtitle": "rgba(230,252,255,0.94)","--subtitleGlow": "rgba(110,235,255,0.35)",
-        "--flash": "rgba(220,255,255,0.22)","--shine": "rgba(230,255,255,0.22)",
-        "--btn1": "#7beeff","--btn2": "#2d9db0","--btnGlow": "rgba(100,240,255,0.25)",
-        "--inputBorder": "rgba(160,245,255,0.3)","--inputBg": "rgba(5, 18, 22, 0.75)",
-        "--inputText": "#e9fdff","--inputPlaceholder": "rgba(210,250,255,0.6)",
-        "--messageBg": "rgba(8, 25, 30, 0.8)","--messageBorder": "rgba(130,240,255,0.25)",
-        "--messageText": "#e0fdff","--helper": "#dffcff","--accent": "#7beeff"
-      },
-      gold: {
-        "--bg1": "#241b06","--bg2": "#120d02","--bg3": "#050300",
-        "--orb1": "rgba(255,210,90,0.14)","--orb2": "rgba(220,160,0,0.18)","--orb3": "rgba(255,240,180,0.03)",
-        "--grid1": "rgba(255,210,70,0.09)","--grid2": "rgba(255,230,120,0.09)",
-        "--particle": "#ffd56a","--particleGlow": "#ffbf33","--ring": "rgba(255,210,70,0.15)",
-        "--titleMain": "#fff1c4","--titleGlow1": "rgba(255,241,196,0.95)","--titleGlow2": "rgba(255,210,60,0.8)",
-        "--titleGlow3": "rgba(255,170,0,0.6)","--titleGlow4": "rgba(180,120,0,0.28)",
-        "--titleBefore": "#b3861f","--titleAfter": "#5c430f",
-        "--subtitle": "rgba(255,245,210,0.94)","--subtitleGlow": "rgba(255,205,60,0.35)",
-        "--flash": "rgba(255,240,180,0.22)","--shine": "rgba(255,245,190,0.22)",
-        "--btn1": "#ffd86a","--btn2": "#b07b13","--btnGlow": "rgba(255,200,60,0.25)",
-        "--inputBorder": "rgba(255,220,120,0.3)","--inputBg": "rgba(26, 20, 5, 0.75)",
-        "--inputText": "#fff4d6","--inputPlaceholder": "rgba(255,240,190,0.6)",
-        "--messageBg": "rgba(40, 30, 6, 0.8)","--messageBorder": "rgba(255,210,90,0.25)",
-        "--messageText": "#fff1c9","--helper": "#fff0c2","--accent": "#ffd86a"
-      },
-      white: {
-        "--bg1": "#202020","--bg2": "#101010","--bg3": "#050505",
-        "--orb1": "rgba(255,255,255,0.10)","--orb2": "rgba(220,220,220,0.12)","--orb3": "rgba(255,255,255,0.03)",
-        "--grid1": "rgba(255,255,255,0.07)","--grid2": "rgba(220,220,220,0.07)",
-        "--particle": "#ffffff","--particleGlow": "#d9d9d9","--ring": "rgba(255,255,255,0.12)",
-        "--titleMain": "#ffffff","--titleGlow1": "rgba(255,255,255,0.95)","--titleGlow2": "rgba(230,230,230,0.75)",
-        "--titleGlow3": "rgba(200,200,200,0.50)","--titleGlow4": "rgba(160,160,160,0.22)",
-        "--titleBefore": "#bdbdbd","--titleAfter": "#6d6d6d",
-        "--subtitle": "rgba(245,245,245,0.94)","--subtitleGlow": "rgba(255,255,255,0.30)",
-        "--flash": "rgba(255,255,255,0.18)","--shine": "rgba(255,255,255,0.18)",
-        "--btn1": "#ffffff","--btn2": "#999999","--btnGlow": "rgba(255,255,255,0.20)",
-        "--inputBorder": "rgba(255,255,255,0.20)","--inputBg": "rgba(20, 20, 20, 0.75)",
-        "--inputText": "#ffffff","--inputPlaceholder": "rgba(230,230,230,0.6)",
-        "--messageBg": "rgba(30, 30, 30, 0.8)","--messageBorder": "rgba(255,255,255,0.18)",
-        "--messageText": "#ffffff","--helper": "#eeeeee","--accent": "#ffffff"
-      },
-      rainbow: {
-        "--bg1": "#1a001a","--bg2": "#0d0010","--bg3": "#040004",
-        "--orb1": "rgba(255,0,120,0.14)","--orb2": "rgba(0,180,255,0.18)","--orb3": "rgba(255,255,120,0.03)",
-        "--grid1": "rgba(255,0,180,0.09)","--grid2": "rgba(0,200,255,0.09)",
-        "--particle": "#ff4fe1","--particleGlow": "#44d7ff","--ring": "rgba(255,90,255,0.15)",
-        "--titleMain": "#ffffff","--titleGlow1": "rgba(255,255,255,0.95)","--titleGlow2": "rgba(255,0,180,0.8)",
-        "--titleGlow3": "rgba(0,180,255,0.6)","--titleGlow4": "rgba(255,220,0,0.28)",
-        "--titleBefore": "#ff48b0","--titleAfter": "#2d6eff",
-        "--subtitle": "rgba(255,255,255,0.94)","--subtitleGlow": "rgba(255,100,255,0.35)",
-        "--flash": "rgba(255,255,255,0.20)","--shine": "rgba(255,255,255,0.22)",
-        "--btn1": "#ff48b0","--btn2": "#2d6eff","--btnGlow": "rgba(255,100,255,0.25)",
-        "--inputBorder": "rgba(255,150,255,0.3)","--inputBg": "rgba(20, 5, 24, 0.75)",
-        "--inputText": "#ffffff","--inputPlaceholder": "rgba(255,220,255,0.6)",
-        "--messageBg": "rgba(30, 10, 35, 0.8)","--messageBorder": "rgba(255,130,255,0.25)",
-        "--messageText": "#ffffff","--helper": "#ffe9ff","--accent": "#ff48b0"
-      }
+      orange: {"--bg1":"#2b0d00","--bg2":"#120500","--bg3":"#050100","--orb1":"rgba(255,80,0,0.14)","--orb2":"rgba(255,20,0,0.18)","--orb3":"rgba(255,180,80,0.03)","--grid1":"rgba(255,90,0,0.09)","--grid2":"rgba(255,120,0,0.09)","--particle":"#ff7b00","--particleGlow":"#ff5e00","--ring":"rgba(255,110,0,0.15)","--titleMain":"#ffd6a0","--titleGlow1":"rgba(255,214,160,0.95)","--titleGlow2":"rgba(255,120,0,0.8)","--titleGlow3":"rgba(255,70,0,0.6)","--titleGlow4":"rgba(255,40,0,0.28)","--titleBefore":"#b83a00","--titleAfter":"#5f1800","--subtitle":"rgba(255,220,180,0.94)","--subtitleGlow":"rgba(255,100,0,0.35)","--flash":"rgba(255,200,120,0.22)","--shine":"rgba(255,220,140,0.22)","--btn1":"#ff7a00","--btn2":"#b32000","--btnGlow":"rgba(255,100,0,0.25)","--inputBorder":"rgba(255,160,80,0.3)","--inputBg":"rgba(20, 8, 0, 0.75)","--inputText":"#ffe2c2","--inputPlaceholder":"rgba(255,210,170,0.6)","--messageBg":"rgba(40, 10, 0, 0.8)","--messageBorder":"rgba(255,120,0,0.25)","--messageText":"#ffd6b0","--helper":"#ffd9ba","--accent":"#ff7a00"},
+      blue: {"--bg1":"#08182e","--bg2":"#050c18","--bg3":"#02050a","--orb1":"rgba(0,140,255,0.14)","--orb2":"rgba(0,70,255,0.18)","--orb3":"rgba(130,220,255,0.03)","--grid1":"rgba(0,140,255,0.09)","--grid2":"rgba(60,180,255,0.09)","--particle":"#35b6ff","--particleGlow":"#008cff","--ring":"rgba(0,140,255,0.15)","--titleMain":"#bfe9ff","--titleGlow1":"rgba(191,233,255,0.95)","--titleGlow2":"rgba(0,160,255,0.8)","--titleGlow3":"rgba(0,100,255,0.6)","--titleGlow4":"rgba(0,70,255,0.28)","--titleBefore":"#1f73c9","--titleAfter":"#0e3566","--subtitle":"rgba(205,235,255,0.94)","--subtitleGlow":"rgba(0,140,255,0.35)","--flash":"rgba(140,210,255,0.22)","--shine":"rgba(140,220,255,0.22)","--btn1":"#23a6ff","--btn2":"#0c4db9","--btnGlow":"rgba(0,130,255,0.25)","--inputBorder":"rgba(90,170,255,0.3)","--inputBg":"rgba(4, 10, 25, 0.75)","--inputText":"#d9f1ff","--inputPlaceholder":"rgba(180,220,255,0.6)","--messageBg":"rgba(5, 18, 40, 0.8)","--messageBorder":"rgba(80,150,255,0.25)","--messageText":"#d5ebff","--helper":"#cde8ff","--accent":"#23a6ff"},
+      green: {"--bg1":"#081f12","--bg2":"#04110a","--bg3":"#010503","--orb1":"rgba(0,255,120,0.14)","--orb2":"rgba(0,180,90,0.18)","--orb3":"rgba(180,255,210,0.03)","--grid1":"rgba(0,255,120,0.09)","--grid2":"rgba(90,255,170,0.09)","--particle":"#28ff9a","--particleGlow":"#00d87f","--ring":"rgba(0,255,120,0.15)","--titleMain":"#c7ffe0","--titleGlow1":"rgba(199,255,224,0.95)","--titleGlow2":"rgba(0,255,140,0.8)","--titleGlow3":"rgba(0,200,110,0.6)","--titleGlow4":"rgba(0,120,70,0.28)","--titleBefore":"#1aa35d","--titleAfter":"#0b4a29","--subtitle":"rgba(210,255,228,0.94)","--subtitleGlow":"rgba(0,255,130,0.35)","--flash":"rgba(160,255,210,0.22)","--shine":"rgba(170,255,215,0.22)","--btn1":"#1dff91","--btn2":"#0b8c4b","--btnGlow":"rgba(0,220,120,0.25)","--inputBorder":"rgba(100,255,170,0.3)","--inputBg":"rgba(4, 20, 10, 0.75)","--inputText":"#dcffeb","--inputPlaceholder":"rgba(190,255,220,0.6)","--messageBg":"rgba(5, 35, 16, 0.8)","--messageBorder":"rgba(80,255,150,0.25)","--messageText":"#d7ffea","--helper":"#d6ffea","--accent":"#1dff91"},
+      pink: {"--bg1":"#2b0820","--bg2":"#14050f","--bg3":"#060104","--orb1":"rgba(255,70,180,0.14)","--orb2":"rgba(255,20,140,0.18)","--orb3":"rgba(255,180,230,0.03)","--grid1":"rgba(255,70,180,0.09)","--grid2":"rgba(255,120,220,0.09)","--particle":"#ff4fc3","--particleGlow":"#ff1fa3","--ring":"rgba(255,70,180,0.15)","--titleMain":"#ffd0ef","--titleGlow1":"rgba(255,208,239,0.95)","--titleGlow2":"rgba(255,80,190,0.8)","--titleGlow3":"rgba(255,40,150,0.6)","--titleGlow4":"rgba(255,20,120,0.28)","--titleBefore":"#b52f7e","--titleAfter":"#5c1740","--subtitle":"rgba(255,220,245,0.94)","--subtitleGlow":"rgba(255,70,180,0.35)","--flash":"rgba(255,180,230,0.22)","--shine":"rgba(255,190,235,0.22)","--btn1":"#ff5cc7","--btn2":"#b31372","--btnGlow":"rgba(255,70,180,0.25)","--inputBorder":"rgba(255,130,210,0.3)","--inputBg":"rgba(25, 4, 18, 0.75)","--inputText":"#ffe0f4","--inputPlaceholder":"rgba(255,200,230,0.6)","--messageBg":"rgba(40, 8, 28, 0.8)","--messageBorder":"rgba(255,120,200,0.25)","--messageText":"#ffd8f0","--helper":"#ffd8f0","--accent":"#ff5cc7"},
+      yellow: {"--bg1":"#2b2500","--bg2":"#141000","--bg3":"#050400","--orb1":"rgba(255,220,0,0.14)","--orb2":"rgba(255,180,0,0.18)","--orb3":"rgba(255,245,180,0.03)","--grid1":"rgba(255,220,0,0.09)","--grid2":"rgba(255,235,80,0.09)","--particle":"#ffd93a","--particleGlow":"#ffbf00","--ring":"rgba(255,220,0,0.15)","--titleMain":"#fff1b0","--titleGlow1":"rgba(255,241,176,0.95)","--titleGlow2":"rgba(255,220,0,0.8)","--titleGlow3":"rgba(255,190,0,0.6)","--titleGlow4":"rgba(255,150,0,0.28)","--titleBefore":"#b59200","--titleAfter":"#5f4700","--subtitle":"rgba(255,245,190,0.94)","--subtitleGlow":"rgba(255,210,0,0.35)","--flash":"rgba(255,245,150,0.22)","--shine":"rgba(255,240,150,0.22)","--btn1":"#ffd83a","--btn2":"#b38200","--btnGlow":"rgba(255,210,0,0.25)","--inputBorder":"rgba(255,220,100,0.3)","--inputBg":"rgba(25, 20, 2, 0.75)","--inputText":"#fff4cb","--inputPlaceholder":"rgba(255,240,180,0.6)","--messageBg":"rgba(45, 35, 4, 0.8)","--messageBorder":"rgba(255,220,80,0.25)","--messageText":"#fff0bf","--helper":"#fff0bf","--accent":"#ffd83a"},
+      red: {"--bg1":"#240707","--bg2":"#120303","--bg3":"#040101","--orb1":"rgba(255,70,70,0.14)","--orb2":"rgba(200,0,0,0.18)","--orb3":"rgba(255,180,180,0.03)","--grid1":"rgba(255,50,50,0.09)","--grid2":"rgba(255,90,90,0.09)","--particle":"#ff4545","--particleGlow":"#ff2020","--ring":"rgba(255,70,70,0.15)","--titleMain":"#ffd2d2","--titleGlow1":"rgba(255,210,210,0.95)","--titleGlow2":"rgba(255,60,60,0.8)","--titleGlow3":"rgba(255,20,20,0.6)","--titleGlow4":"rgba(180,0,0,0.28)","--titleBefore":"#aa1f1f","--titleAfter":"#541010","--subtitle":"rgba(255,220,220,0.94)","--subtitleGlow":"rgba(255,80,80,0.35)","--flash":"rgba(255,170,170,0.22)","--shine":"rgba(255,180,180,0.22)","--btn1":"#ff4a4a","--btn2":"#a80000","--btnGlow":"rgba(255,70,70,0.25)","--inputBorder":"rgba(255,130,130,0.3)","--inputBg":"rgba(25, 5, 5, 0.75)","--inputText":"#ffe3e3","--inputPlaceholder":"rgba(255,200,200,0.6)","--messageBg":"rgba(40, 8, 8, 0.8)","--messageBorder":"rgba(255,90,90,0.25)","--messageText":"#ffd6d6","--helper":"#ffd6d6","--accent":"#ff4a4a"},
+      purple: {"--bg1":"#180824","--bg2":"#0b0414","--bg3":"#030106","--orb1":"rgba(170,80,255,0.14)","--orb2":"rgba(120,0,255,0.18)","--orb3":"rgba(220,180,255,0.03)","--grid1":"rgba(180,90,255,0.09)","--grid2":"rgba(210,130,255,0.09)","--particle":"#bb68ff","--particleGlow":"#9c35ff","--ring":"rgba(170,80,255,0.15)","--titleMain":"#ead5ff","--titleGlow1":"rgba(234,213,255,0.95)","--titleGlow2":"rgba(180,90,255,0.8)","--titleGlow3":"rgba(130,40,255,0.6)","--titleGlow4":"rgba(90,0,180,0.28)","--titleBefore":"#7431b3","--titleAfter":"#3a145b","--subtitle":"rgba(240,225,255,0.94)","--subtitleGlow":"rgba(180,90,255,0.35)","--flash":"rgba(220,180,255,0.22)","--shine":"rgba(225,190,255,0.22)","--btn1":"#b86bff","--btn2":"#5b18a8","--btnGlow":"rgba(170,80,255,0.25)","--inputBorder":"rgba(190,130,255,0.3)","--inputBg":"rgba(15, 5, 28, 0.75)","--inputText":"#efe0ff","--inputPlaceholder":"rgba(220,190,255,0.6)","--messageBg":"rgba(20, 8, 40, 0.8)","--messageBorder":"rgba(170,110,255,0.25)","--messageText":"#ead8ff","--helper":"#ead8ff","--accent":"#b86bff"},
+      ice: {"--bg1":"#081a1f","--bg2":"#041014","--bg3":"#010607","--orb1":"rgba(120,240,255,0.14)","--orb2":"rgba(70,200,255,0.18)","--orb3":"rgba(220,255,255,0.03)","--grid1":"rgba(140,240,255,0.09)","--grid2":"rgba(180,255,255,0.09)","--particle":"#90f5ff","--particleGlow":"#4be7ff","--ring":"rgba(140,240,255,0.15)","--titleMain":"#e8fdff","--titleGlow1":"rgba(232,253,255,0.95)","--titleGlow2":"rgba(130,245,255,0.8)","--titleGlow3":"rgba(80,220,255,0.6)","--titleGlow4":"rgba(50,160,220,0.28)","--titleBefore":"#57a7b5","--titleAfter":"#24515a","--subtitle":"rgba(230,252,255,0.94)","--subtitleGlow":"rgba(110,235,255,0.35)","--flash":"rgba(220,255,255,0.22)","--shine":"rgba(230,255,255,0.22)","--btn1":"#7beeff","--btn2":"#2d9db0","--btnGlow":"rgba(100,240,255,0.25)","--inputBorder":"rgba(160,245,255,0.3)","--inputBg":"rgba(5, 18, 22, 0.75)","--inputText":"#e9fdff","--inputPlaceholder":"rgba(210,250,255,0.6)","--messageBg":"rgba(8, 25, 30, 0.8)","--messageBorder":"rgba(130,240,255,0.25)","--messageText":"#e0fdff","--helper":"#dffcff","--accent":"#7beeff"},
+      gold: {"--bg1":"#241b06","--bg2":"#120d02","--bg3":"#050300","--orb1":"rgba(255,210,90,0.14)","--orb2":"rgba(220,160,0,0.18)","--orb3":"rgba(255,240,180,0.03)","--grid1":"rgba(255,210,70,0.09)","--grid2":"rgba(255,230,120,0.09)","--particle":"#ffd56a","--particleGlow":"#ffbf33","--ring":"rgba(255,210,70,0.15)","--titleMain":"#fff1c4","--titleGlow1":"rgba(255,241,196,0.95)","--titleGlow2":"rgba(255,210,60,0.8)","--titleGlow3":"rgba(255,170,0,0.6)","--titleGlow4":"rgba(180,120,0,0.28)","--titleBefore":"#b3861f","--titleAfter":"#5c430f","--subtitle":"rgba(255,245,210,0.94)","--subtitleGlow":"rgba(255,205,60,0.35)","--flash":"rgba(255,240,180,0.22)","--shine":"rgba(255,245,190,0.22)","--btn1":"#ffd86a","--btn2":"#b07b13","--btnGlow":"rgba(255,200,60,0.25)","--inputBorder":"rgba(255,220,120,0.3)","--inputBg":"rgba(26, 20, 5, 0.75)","--inputText":"#fff4d6","--inputPlaceholder":"rgba(255,240,190,0.6)","--messageBg":"rgba(40, 30, 6, 0.8)","--messageBorder":"rgba(255,210,90,0.25)","--messageText":"#fff1c9","--helper":"#fff0c2","--accent":"#ffd86a"},
+      white: {"--bg1":"#202020","--bg2":"#101010","--bg3":"#050505","--orb1":"rgba(255,255,255,0.10)","--orb2":"rgba(220,220,220,0.12)","--orb3":"rgba(255,255,255,0.03)","--grid1":"rgba(255,255,255,0.07)","--grid2":"rgba(220,220,220,0.07)","--particle":"#ffffff","--particleGlow":"#d9d9d9","--ring":"rgba(255,255,255,0.12)","--titleMain":"#ffffff","--titleGlow1":"rgba(255,255,255,0.95)","--titleGlow2":"rgba(230,230,230,0.75)","--titleGlow3":"rgba(200,200,200,0.50)","--titleGlow4":"rgba(160,160,160,0.22)","--titleBefore":"#bdbdbd","--titleAfter":"#6d6d6d","--subtitle":"rgba(245,245,245,0.94)","--subtitleGlow":"rgba(255,255,255,0.30)","--flash":"rgba(255,255,255,0.18)","--shine":"rgba(255,255,255,0.18)","--btn1":"#ffffff","--btn2":"#999999","--btnGlow":"rgba(255,255,255,0.20)","--inputBorder":"rgba(255,255,255,0.20)","--inputBg":"rgba(20, 20, 20, 0.75)","--inputText":"#ffffff","--inputPlaceholder":"rgba(230,230,230,0.6)","--messageBg":"rgba(30, 30, 30, 0.8)","--messageBorder":"rgba(255,255,255,0.18)","--messageText":"#ffffff","--helper":"#eeeeee","--accent":"#ffffff"},
+      rainbow: {"--bg1":"#1a001a","--bg2":"#0d0010","--bg3":"#040004","--orb1":"rgba(255,0,120,0.14)","--orb2":"rgba(0,180,255,0.18)","--orb3":"rgba(255,255,120,0.03)","--grid1":"rgba(255,0,180,0.09)","--grid2":"rgba(0,200,255,0.09)","--particle":"#ff4fe1","--particleGlow":"#44d7ff","--ring":"rgba(255,90,255,0.15)","--titleMain":"#ffffff","--titleGlow1":"rgba(255,255,255,0.95)","--titleGlow2":"rgba(255,0,180,0.8)","--titleGlow3":"rgba(0,180,255,0.6)","--titleGlow4":"rgba(255,220,0,0.28)","--titleBefore":"#ff48b0","--titleAfter":"#2d6eff","--subtitle":"rgba(255,255,255,0.94)","--subtitleGlow":"rgba(255,100,255,0.35)","--flash":"rgba(255,255,255,0.20)","--shine":"rgba(255,255,255,0.22)","--btn1":"#ff48b0","--btn2":"#2d6eff","--btnGlow":"rgba(255,100,255,0.25)","--inputBorder":"rgba(255,150,255,0.3)","--inputBg":"rgba(20, 5, 24, 0.75)","--inputText":"#ffffff","--inputPlaceholder":"rgba(255,220,255,0.6)","--messageBg":"rgba(30, 10, 35, 0.8)","--messageBorder":"rgba(255,130,255,0.25)","--messageText":"#ffffff","--helper":"#ffe9ff","--accent":"#ff48b0"}
     };
 
     const fontMap = {
@@ -969,10 +867,8 @@
       Object.values(animationClassMap).forEach(cls => {
         if (cls) scene.classList.remove(cls);
       });
-
       const selectedClass = animationClassMap[mode];
       if (selectedClass) scene.classList.add(selectedClass);
-
       saveSettings();
     }
 
@@ -988,10 +884,11 @@
 
     function buildParticles() {
       particles.innerHTML = "";
-      for (let i = 0; i < 85; i++) {
+      const count = window.innerWidth < 768 ? 55 : 85;
+      for (let i = 0; i < count; i++) {
         const p = document.createElement("div");
         p.className = "particle";
-        const size = 2 + Math.random() * 7;
+        const size = window.innerWidth < 768 ? 2 + Math.random() * 5 : 2 + Math.random() * 7;
         p.style.width = size + "px";
         p.style.height = size + "px";
         p.style.left = Math.random() * 100 + "vw";
@@ -1005,7 +902,8 @@
 
     function buildRings() {
       rings.innerHTML = "";
-      for (let i = 0; i < 4; i++) {
+      const count = window.innerWidth < 768 ? 3 : 4;
+      for (let i = 0; i < count; i++) {
         const ring = document.createElement("div");
         ring.className = "ring";
         ring.style.animationDelay = (i * 1.2) + "s";
@@ -1014,6 +912,10 @@
     }
 
     function strongShake(intensity = 18, duration = 550) {
+      const mobileFactor = window.innerWidth < 768 ? 0.55 : 1;
+      intensity *= mobileFactor;
+      duration *= window.innerWidth < 768 ? 0.9 : 1;
+
       const start = performance.now();
 
       function frame(now) {
@@ -1164,23 +1066,24 @@
       titleText.textContent = clean;
       titleText.setAttribute("data-text", clean);
 
-      const wrapWidth = document.querySelector(".logo-wrap").clientWidth * 0.9;
-      let fontSize = Math.min(window.innerWidth * 0.09, 150);
+      const wrapWidth = document.querySelector(".logo-wrap").clientWidth * 0.94;
+      const mobile = window.innerWidth < 768;
+      let fontSize = mobile ? Math.min(window.innerWidth * 0.13, 72) : Math.min(window.innerWidth * 0.09, 150);
       let fits = false;
 
-      for (let i = 0; i < 70; i++) {
+      for (let i = 0; i < 90; i++) {
         titleText.style.fontSize = fontSize + "px";
-        titleText.style.letterSpacing = Math.max(1, fontSize * 0.05) + "px";
+        titleText.style.letterSpacing = (mobile ? Math.max(0.5, fontSize * 0.025) : Math.max(1, fontSize * 0.05)) + "px";
 
         const width = titleText.getBoundingClientRect().width;
         if (width <= wrapWidth) {
           fits = true;
           break;
         }
-        fontSize -= 2.2;
+        fontSize -= mobile ? 1.4 : 2.2;
       }
 
-      if (!fits || fontSize < 24) {
+      if (!fits || fontSize < (mobile ? 18 : 24)) {
         return { ok: false, reason: "Too long, pick a shorter name/text" };
       }
 
@@ -1256,7 +1159,7 @@
         const canvas = await html2canvas(captureArea, {
           backgroundColor: null,
           useCORS: true,
-          scale: 2
+          scale: window.innerWidth < 768 ? 1.5 : 2
         });
 
         if (!wasGuiHidden) {
@@ -1359,6 +1262,8 @@
 
     window.addEventListener("resize", () => {
       fitText(currentText || textInput.value || "Mamo Blox");
+      buildParticles();
+      buildRings();
     });
 
     loadSettings();
